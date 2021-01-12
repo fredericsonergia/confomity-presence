@@ -1,0 +1,9 @@
+Data
+src/EAF
+.vscode
+labrlImg
+models
+src/EAF_2labels
+notebook
+.DS_Store
+__pycache__
