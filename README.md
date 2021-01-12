@@ -1,5 +1,4 @@
-
-# Conda environnement (pour moi)
+# Conda environnement (Alide)
 source ~/.bash_profile 
 conda activate presence
 conda deactivate presence
