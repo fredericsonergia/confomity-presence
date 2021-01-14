@@ -1,7 +1,6 @@
 Data
 src/EAF
 .vscode
-labelImg
 models
 src/EAF_2labels
 notebook
