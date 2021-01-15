@@ -2,6 +2,7 @@ from gluoncv.data import VOCDetection
 from gluoncv import model_zoo
 import mxnet as mx
 from mxnet import autograd, gluon
+import gluoncv as gcv
 
 
 class VOCLike(VOCDetection):
@@ -17,11 +18,12 @@ def load_data_VOC(root='../Data/EAF_2labels'):
 
 
 def get_pretrained_model(classes):
+    #ssd_512_resnet50_v1_voc
     net = model_zoo.get_model('ssd_512_mobilenet1.0_custom', classes=classes, pretrained_base=False, transfer='voc')
     return net
 
 
-def get_train_dataloader(net, train_dataset, data_shape=512, batch_size=10, num_workers=0):
+def train_dataloader(net, train_dataset, data_shape=512, batch_size=10, num_workers=0):
     from gluoncv.data.batchify import Tuple, Stack, Pad
     from gluoncv.data.transforms.presets.ssd import SSDDefaultTrainTransform
     width, height = data_shape, data_shape
@@ -34,7 +36,7 @@ def get_train_dataloader(net, train_dataset, data_shape=512, batch_size=10, num_
         batch_size, True, batchify_fn=batchify_fn, last_batch='rollover', num_workers=num_workers)
     return train_loader
 
-def get_val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0):
+def val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0):
     from gluoncv.data.batchify import Tuple, Stack, Pad
     from gluoncv.data.transforms.presets.ssd import SSDDefaultValTransform
     width, height = data_shape, data_shape
@@ -80,11 +82,11 @@ def save_params(net, best_map, current_map, epoch, save_interval=5, prefix='ssd_
     current_map = float(current_map)
     if current_map > best_map[0]:
         best_map[0] = current_map
-        net.save_parameters('/models/{:s}_best.params'.format(prefix))
-        with open(prefix+'_best_map.log', 'a') as f:
+        net.save_parameters('models/{:s}_best.params'.format(prefix))
+        with open('logs/'+prefix+'_best_map.log', 'a') as f:
             f.write('{:04d}:\t{:.4f}\n'.format(epoch, current_map))
     if save_interval and epoch % save_interval == 0:
-        net.save_parameters('/models/{:s}_{:04d}_{:.4f}.params'.format(prefix, epoch, current_map))
+        net.save_parameters('models/{:s}_{:04d}_{:.4f}.params'.format(prefix, epoch, current_map))
 
 def get_ctx():
     try:
@@ -93,3 +95,35 @@ def get_ctx():
     except:
         ctx = [mx.cpu()]
     return ctx
+
+def val_loss(net, val_data, ctx):
+    """Test on validation dataset."""
+    mx.nd.waitall()
+    net.hybridize()
+    mbox_loss_val = gcv.loss.SSDMultiBoxLoss()
+    ce_metric_val = mx.metric.Loss('CrossEntropy')
+    smoothl1_metric_val = mx.metric.Loss('SmoothL1')
+    ce_metric_val.reset()
+    smoothl1_metric_val.reset()
+    for batch in val_data:
+        batch_size = batch[0].shape[0]
+        data = gluon.utils.split_and_load(batch[0], ctx_list=ctx, batch_axis=0)
+        cls_targets = gluon.utils.split_and_load(batch[1], ctx_list=ctx, batch_axis=0)
+        box_targets = gluon.utils.split_and_load(batch[2], ctx_list=ctx, batch_axis=0)
+        with autograd.record():
+            cls_preds = []
+            box_preds = []
+            for x in data:
+                cls_pred, box_pred, _ = net(x)
+                cls_preds.append(cls_pred)
+                box_preds.append(box_pred)
+            sum_loss, cls_loss, box_loss = mbox_loss_val(
+                cls_preds, box_preds, cls_targets, box_targets)
+            autograd.backward(sum_loss)
+        # since we have already normalized the loss, we don't want to normalize
+        # by batch-size anymore
+        ce_metric_val.update(0, [l * batch_size for l in cls_loss])
+        smoothl1_metric_val.update(0, [l * batch_size for l in box_loss])
+        name1, loss1 = ce_metric_val.get()
+        name2, loss2 = smoothl1_metric_val.get()
+    return loss1, loss2
