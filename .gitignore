@@ -11,3 +11,5 @@ inputs
 outputs
 results
 logs
+.gitlab-ci.yml
+uploads
