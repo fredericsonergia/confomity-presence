@@ -20,9 +20,9 @@ def generate_image(path, has_protection=True):
 
 def generate_set(number_of_ok, number_of_ko, path, file_name_template):
     for i in range(number_of_ok):
-        generate_image(path + file_name_template + "ok" + str(i) + ".jpg")
+        generate_image(path + file_name_template + "ok_" + str(i) + ".jpg")
     for i in range(number_of_ko):
-        generate_image(path + file_name_template + "ko" + str(i) + ".jpg", False)
+        generate_image(path + file_name_template + "ko_" + str(i) + ".jpg", False)
 
 
 if __name__ == "__main__":
