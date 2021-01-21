@@ -9,7 +9,7 @@ class ChimneyFactory:
         if random_type == "cuboid":
             return CubicChimney()
         elif random_type == "cylinder":
-            return RoundChimney()
+            return CubicChimney()
 
     def createRoundChimney(self, size, loc, vertices):
         return RoundChimney(size, loc, vertices)

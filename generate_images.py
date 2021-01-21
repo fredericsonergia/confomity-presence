@@ -1,6 +1,7 @@
 import time
 import sys
 
+
 sys.path.append("./blender")
 
 from Scene import Scene  # pylint: disable=import-error
@@ -27,6 +28,6 @@ def generate_set(number_of_ok, number_of_ko, path, file_name_template):
 
 if __name__ == "__main__":
     start = time.time()
-    generate_set(1, 1, "/Users/matthieu/Documents/Project3/image_generator/", "image_")
+    generate_image("/Users/matthieu/Documents/Project3/image_generator/rectangle.jpg")
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
