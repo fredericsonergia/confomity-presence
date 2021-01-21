@@ -23,7 +23,7 @@ def get_pretrained_model(classes):
     return net
 
 
-def train_dataloader(net, train_dataset, data_shape=512, batch_size=10, num_workers=0):
+def ssd_train_dataloader(net, train_dataset, data_shape=512, batch_size=10, num_workers=0):
     from gluoncv.data.batchify import Tuple, Stack, Pad
     from gluoncv.data.transforms.presets.ssd import SSDDefaultTrainTransform
     width, height = data_shape, data_shape
@@ -36,7 +36,7 @@ def train_dataloader(net, train_dataset, data_shape=512, batch_size=10, num_work
         batch_size, True, batchify_fn=batchify_fn, last_batch='rollover', num_workers=num_workers)
     return train_loader
 
-def val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0):
+def ssd_val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0):
     from gluoncv.data.batchify import Tuple, Stack, Pad
     from gluoncv.data.transforms.presets.ssd import SSDDefaultValTransform
     width, height = data_shape, data_shape
@@ -79,6 +79,9 @@ def validate(net, val_data, ctx, eval_metric, flip_test=False):
 
 
 def save_params(net, best_map, current_map, epoch, save_interval=5, prefix='ssd_512'):
+    '''
+    save parameters of the networks
+    '''
     current_map = float(current_map)
     if current_map > best_map[0]:
         best_map[0] = current_map

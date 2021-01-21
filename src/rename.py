@@ -15,10 +15,12 @@ parser.add_argument(
     "--name", default='', dest="name", help="the name of images"
 )
 
+parser.add_argument(
+    "--start", default='', dest="start", help="the number from which the annotation begin"
+)
+
 args = parser.parse_args()
 
 if args.name:
-    rename_img(args.path, args.name)
-
-add_text(args.path)
+    rename_img(args.path, args.name, args.start)
 

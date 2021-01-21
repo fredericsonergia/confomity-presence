@@ -35,10 +35,6 @@ parser.add_argument(
     "--save-plot", default=True, dest="save_plot", help="saving or not the train curve"
 )
 
-parser.add_argument(
-    "--suffix-plot", default='1', dest="suffix_plot", help="suffix for the plot file"
-)
-
 args = parser.parse_args()
 
 

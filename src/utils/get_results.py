@@ -31,7 +31,7 @@ def load_model(name_model):
     return net
 
 
-def get_ouput_model(image_path, name_model, thresh, name_output, close = False):
+def get_ouput_model(image_path, name_model, thresh, name_output, close=False):
     x, img = gcv.data.transforms.presets.ssd.load_test(image_path, 512)
     net = load_model(name_model)
     box_ids, scores, bboxes = net(x)
@@ -49,15 +49,18 @@ def get_ouput_model(image_path, name_model, thresh, name_output, close = False):
 
     return n_scores.asnumpy()[0][0][0], 'outputs/'+name_output+'.png'
 
-def process_output_img(name, name_output = 'output.jpg'):
-    img = cv2.imread(name) # Read in the image and convert to grayscale
+def process_output_img(name_path):
+    path, filename = os.path.split(name_path)
+    img = cv2.imread(name_path) # Read in the image and convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = 255*(gray < 128).astype(np.uint8) # To invert the text to white
     coords = cv2.findNonZero(gray) # Find all non-zero points (text)
     x, y, w, h = cv2.boundingRect(coords) # Find minimum spanning bounding box
     rect = img[y:y+h, x:x+w] # Crop the image - note we do this on the original image
-    cv2.imwrite('outputs/'+name_output, rect)
-    os.remove(name)
+    output_image_path = path + '/corrected_' + filename
+    cv2.imwrite(output_image_path, rect)
+    os.remove(name_path)
+    return output_image_path
 
 def get_prediction(score, thresh):
     if score >= thresh:
@@ -122,7 +125,7 @@ def get_labels_and_scores(val_dataset, test_img_list, net):
 
 
 def plot_train(epochs, ce_loss_list, ce_loss_val,
-               smooth_loss_list, smooth_loss_val, map_list,
+               smooth_loss_list, smooth_loss_val, map_list, save_prefix,
                save_plot = True):
     f = plt.figure(figsize=(5,10))
     ax = f.add_subplot(311)
@@ -146,4 +149,4 @@ def plot_train(epochs, ce_loss_list, ce_loss_val,
     plt.xlabel('epoch')
     plt.title('MAP for eaf')
     if save_plot:
-        f.savefig('results/train_curves.png')
+        f.savefig('results/' + save_prefix + 'train_curves.png')
