@@ -7,3 +7,9 @@ notebook
 .DS_Store
 __pycache__
 notes.md
+inputs
+outputs
+results
+logs
+.gitlab-ci.yml
+uploads
