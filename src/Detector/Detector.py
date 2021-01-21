@@ -6,14 +6,21 @@ import cv2
 import os
 import logging
 import time
+import sys
 from mxnet import autograd, gluon
 from gluoncv import model_zoo
 from gluoncv import utils
 from mxnet import nd
 from sklearn.metrics import roc_curve, auc
-from utils.trainer import (VOCLike, get_pretrained_model,
-                                 ssd_train_dataloader, ssd_val_dataloader,
-                                 validate, save_params, get_ctx, val_loss)
+try:
+    sys.path.append('../utils')
+    from trainer import (VOCLike, get_pretrained_model,
+                                    ssd_train_dataloader, ssd_val_dataloader,
+                                    validate, save_params, get_ctx, val_loss)
+except:
+    from utils.trainer import (VOCLike, get_pretrained_model,
+                                    ssd_train_dataloader, ssd_val_dataloader,
+                                    validate, save_params, get_ctx, val_loss)
 CLASSES = ['cheminee', 'eaf']
 
 class BaseDetector(object):
@@ -65,12 +72,12 @@ class ModelBasedDetector(BaseDetector):
         self.ctx = None
     
     @classmethod
-    def from_pretrained(cls, base_model='ssd_512_mobilenet1.0_custom'):
+    def from_pretrained(cls, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         return cls(net=net)
 
     @classmethod
-    def from_finetuned(cls,name_model, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3):
+    def from_finetuned(cls, name_model, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
         return cls(net=net, thresh=thresh)
@@ -125,7 +132,7 @@ class ModelBasedDetector(BaseDetector):
         except:
             self.ctx = [mx.cpu()]
 
-    def train(self, save_prefix, start_epoch, epoch, save_interval):
+    def train(self, start_epoch, epoch, save_interval):
         self.set_ctx()
         self.set_dataset()
         logging.basicConfig()
@@ -197,7 +204,7 @@ class ModelBasedDetector(BaseDetector):
             logger.info('[Epoch {}] Validation, {}={:.3f}, {}={:.3f}'.format(
                 epoch, name1, loss1_val, name2, loss2_val))
             smooth_loss_list.append(np.mean(smooth_list))
-            eval_metric = gcv.utils.metrics.voc_detection.VOCMApMetric(iou_thresh=0.3, class_names=CLASSES)
+            eval_metric = gcv.utils.metrics.voc_detection.VOCMApMetric(iou_thresh=0.4, class_names=CLASSES)
             map_name, mean_ap = validate(self.net, self.val_data, self.ctx, eval_metric)
             val_msg = '\n'.join(['{}={}'.format(k, v) for k, v in zip(map_name, mean_ap)])
             current_map = mean_ap[1]

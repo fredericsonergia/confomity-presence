@@ -2,12 +2,14 @@ from flask import Flask,request, Response, jsonify
 import io
 from base64 import encodebytes
 from PIL import Image
-from app import settings
+import settings
 import os 
+import matplotlib
+matplotlib.use('agg')
 import sys
 sys.path.append('../Detector')
 from Detector import ModelBasedDetector
-sys.path.append('../utils')
+sys.path.append('/utils')
 from get_results import process_output_img
 
 
@@ -25,7 +27,7 @@ def allowed_file(filename):
 def configure_app(flask_app):
     flask_app.config['MODEL_FOLDER'] = MODEL_FOLDER
     flask_app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-    flask_app.config['OUTPUT_FOLDER'] = UPLOAD_FOLDER
+    flask_app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
     flask_app.config['SERVER_NAME'] = settings.FLASK_SERVER_NAME
     flask_app.config['SWAGGER_UI_DOC_EXPANSION'] = settings.RESTPLUS_SWAGGER_UI_DOC_EXPANSION
     flask_app.config['RESTPLUS_VALIDATE'] = settings.RESTPLUS_VALIDATE
@@ -33,9 +35,9 @@ def configure_app(flask_app):
     flask_app.config['ERROR_404_HELP'] = settings.RESTPLUS_ERROR_404_HELP
 
 
-@app.route('/', methods=['POST'])
+@app.route('/predict', methods=['POST'])
 def index():
-    detector = ModelBasedDetector.from_finetuned('ssd_512_best.params', thresh=0.2)
+    detector = ModelBasedDetector.from_finetuned('models/ssd_512_best.params', thresh=0.2)
     uploaded_file = request.files.get('file')
     filename = uploaded_file.filename
     if not filename:

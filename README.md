@@ -18,3 +18,10 @@ conda env export > environment.yml
 
 # API
 python app.py
+
+
+# CLI 
+
+python CLI.py train
+python CLI.py eval 
+python CLI.py predict
