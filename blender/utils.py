@@ -15,15 +15,6 @@ def sph2cart(az, el, r):
     return [x, y, z]
 
 
-def generator():
-    yield (0, 1)
-    yield (0, 2)
-    yield (0, 3)
-    yield (1, 2)
-    yield (1, 3)
-    yield (2, 3)
-
-
 def get_area(bottom, top):
     L = abs(top[1] - bottom[1])
     l = abs(bottom[0] - top[0])
@@ -98,13 +89,4 @@ def get_max_rec(scene, camera, box):
         if point[1] > max_y:
             max_y = point[1]
     return [(min_x, min_y), (min_x, max_y), (max_x, max_y), (max_x, min_y)]
-    # for (i, j) in generator():
-    #     area = get_area(bottom_vects[i], top_vects[j])
-    #     if area > max:
-    #         max = area
-    #         max_rect = [
-    #             bottom_vects[i],
-    #             (bottom_vects[i][0], top_vects[j][1]),
-    #             (top_vects[j][0], bottom_vects[i][1]),
-    #             top_vects[j],
-    # ]
+
