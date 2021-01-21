@@ -5,16 +5,16 @@ import mathutils
 from Room import Ground
 from Protection import Random_Protection
 from Light import Light
-from Chimney import Chimney
+from Chimney import ChimneyFactory
 from Camera import Camera
 
 from utils import get_max_rec
 
 
 class Scene:
-    def __init__(self, chimney_size, chimney_loc):
+    def __init__(self):
         self.ground = Ground()
-        self.chimney = Chimney(chimney_size, chimney_loc)
+        self.chimney = ChimneyFactory().createRandomChimney()
         self.protection = Random_Protection()
         self.light = Light()
         self.camera = Camera()
@@ -37,7 +37,7 @@ class Scene:
 
     def render(self, filePath):
         self.camera.prepare_render(filePath)
-        self.camera.render()
+        # self.camera.render()
 
     def clear(self):
         bpy.ops.object.select_all(action="SELECT")
@@ -77,12 +77,3 @@ class Scene:
             {"points": points_eaf, "label": "eaf", "difficult": 0},
             {"points": points_cheminee, "label": "cheminee", "difficult": 0},
         )
-
-
-class Random_Scene(Scene):
-    def __init__(self):
-        self.ground = Ground()
-        self.chimney = Chimney()
-        self.protection = Random_Protection()
-        self.light = Light()
-        self.camera = Camera()

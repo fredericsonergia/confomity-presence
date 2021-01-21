@@ -3,11 +3,11 @@ import sys
 
 sys.path.append("./blender")
 
-from Scene import Random_Scene  # pylint: disable=import-error
+from Scene import Scene  # pylint: disable=import-error
 
 
 def generate_image(path, has_protection=True):
-    s = Random_Scene()
+    s = Scene()
     s.clear()
     if has_protection:
         s.generate_scene_EAF()

@@ -57,11 +57,9 @@ def dichotomie_find_max_z(scene, camera, x, y):
 
 
 def get_2d_coor(scene, camera, co):
-    print("in ", co)
     co_2d = bpy_extras.object_utils.world_to_camera_view(  # pylint: disable=assignment-from-no-return
         scene, camera, co
     )
-    print("out", co_2d)
     render_scale = scene.render.resolution_percentage / 100
     render_size = (
         int(scene.render.resolution_x * render_scale),
@@ -77,11 +75,13 @@ def get_max_rec(scene, camera, box):
     bottom_vects = []
     top_vects = []
     max_rect = []
-    for vector in box[0:4]:
+    for i in range(0, len(box), 2):
+        vector = box[i]
         bottom_vects.append(get_2d_coor(scene, camera, vector))
-    for vector in box[4:8]:
-        # max_z = dichotomie_find_max_z(scene, camera, vector.x, vector.y)
-        # vector.z = max_z
+    for i in range(1, len(box), 2):
+        vector = box[i]
+        max_z = dichotomie_find_max_z(scene, camera, vector.x, vector.y)
+        vector.z = max_z
         top_vects.append(get_2d_coor(scene, camera, vector))
     max = 0
     for (i, j) in generator():

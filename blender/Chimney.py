@@ -3,7 +3,22 @@ import mathutils
 import bpy
 
 
-class Chimney:
+class ChimneyFactory:
+    def createRandomChimney(self):
+        random_type = random.choice(["cylinder", "cuboid"])
+        if random_type == "cuboid":
+            return CubicChimney()
+        elif random_type == "cylinder":
+            return RoundChimney()
+
+    def createRoundChimney(self, size, loc, vertices):
+        return RoundChimney(size, loc, vertices)
+
+    def createCubicChimney(self, size, loc):
+        return CubicChimney(size, loc)
+
+
+class CubicChimney:
     def __init__(
         self,
         size=(random.random() * 2.8 + 1.5, random.random() * 2.8 + 1.5),
@@ -17,69 +32,33 @@ class Chimney:
         self.loc = loc
 
     def draw(self):
-        random_type = random.choice(["cylinder", "cuboid"])
-        if random_type == "cuboid":
-            bpy.ops.mesh.primitive_cube_add(size=1, location=self.loc)
-            bpy.context.object.scale[0] = self.size[0]
-            bpy.context.object.scale[1] = self.size[1]
-            bpy.context.object.scale[2] = 10
-        elif random_type == "cylinder":
-            bpy.ops.mesh.primitive_cylinder_add(
-                vertices=random.randint(3, 65), radius=0.5, location=self.loc
-            )
-            bpy.context.object.scale[0] = self.size[0]
-            bpy.context.object.scale[1] = self.size[1]
-            bpy.context.object.scale[2] = 6
-
-    def get_box(self, show=False):
-        points = [
-            mathutils.Vector((0.5, 0.5, 0)),
-            mathutils.Vector((0.5, -0.5, 0)),
-            mathutils.Vector((-0.5, -0.5, 0)),
-            mathutils.Vector((-0.5, 0.5, 0)),
-        ]
-        for point in points:
-            point += mathutils.Vector((self.loc[0], self.loc[1], 0))
-        if self.size[0] > 0:
-            points[0] += mathutils.Vector((self.size[0], 0, 0))
-            points[1] += mathutils.Vector((self.size[0], 0, 0))
-        if self.size[0] < 0:
-            points[2] += mathutils.Vector((self.size[0], 0, 0))
-            points[3] += mathutils.Vector((self.size[0], 0, 0))
-        if self.size[1] > 0:
-            points[0] += mathutils.Vector((0, self.size[1], 0))
-            points[3] += mathutils.Vector((0, self.size[1], 0))
-        if self.size[1] < 0:
-            points[1] += mathutils.Vector((0, self.size[1], 0))
-            points[2] += mathutils.Vector((0, self.size[1], 0))
-        for i in range(len(points)):
-            points.append(points[i] + mathutils.Vector((0, 0, 10)))
-
-        if show:
-            for point in points:
-                bpy.ops.mesh.primitive_monkey_add(size=0.1, location=point)
-        return points
-
-
-class CubicChimney(Chimney):
-    def draw(self):
         bpy.ops.mesh.primitive_cube_add(size=1, location=self.loc)
         bpy.context.object.scale[0] = self.size[0]
         bpy.context.object.scale[1] = self.size[1]
         bpy.context.object.scale[2] = 10
 
+    def get_box(self):
+        bpy.ops.object.select_all(action="SELECT")
+        bpy.ops.object.transform_apply(scale=True)
+        bpy.ops.object.select_all(action="DESELECT")
+        obj = bpy.data.objects["Cube.001"]
+        points = [vert.co for vert in obj.data.vertices]
+        return points
 
-class RoundChimney(Chimney):
+
+class RoundChimney:
     def __init__(
         self,
         size=(random.random() * 2.8 + 1.5, random.random() * 2.8 + 1.5),
         loc=(
             (-1) ** random.randint(1, 3) * random.random() / 4,
             (-1) ** random.randint(1, 3) * random.random() / 4,
+            5,
         ),
         vertices=random.randint(3, 65),
     ):
-        super().__init__(size, loc)
+        self.size = size
+        self.loc = loc
         self.vertices = vertices
 
     def draw(self):
@@ -89,6 +68,14 @@ class RoundChimney(Chimney):
         bpy.context.object.scale[0] = self.size[0]
         bpy.context.object.scale[1] = self.size[1]
         bpy.context.object.scale[2] = 6
+
+    def get_box(self):
+        bpy.ops.object.select_all(action="SELECT")
+        bpy.ops.object.transform_apply(scale=True)
+        bpy.ops.object.select_all(action="DESELECT")
+        obj = bpy.data.objects["Cylinder"]
+        points = [vert.co for vert in obj.data.vertices]
+        return points
 
 
 #     def color(self):
