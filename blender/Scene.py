@@ -37,7 +37,7 @@ class Scene:
 
     def render(self, filePath):
         self.camera.prepare_render(filePath)
-        # self.camera.render()
+        self.camera.render()
 
     def clear(self):
         bpy.ops.object.select_all(action="SELECT")

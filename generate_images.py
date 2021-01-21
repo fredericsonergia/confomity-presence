@@ -18,10 +18,15 @@ def generate_image(path, has_protection=True):
     s.render(path)
 
 
+def generate_set(number_of_ok, number_of_ko, path, file_name_template):
+    for i in range(number_of_ok):
+        generate_image(path + file_name_template + "ok" + str(i) + ".jpg")
+    for i in range(number_of_ko):
+        generate_image(path + file_name_template + "ko" + str(i) + ".jpg", False)
+
+
 if __name__ == "__main__":
     start = time.time()
-    generate_image(
-        "/Users/matthieu/Documents/Project3/image_generator/testing_camera.jpg"
-    )
+    generate_set(1, 1, "/Users/matthieu/Documents/Project3/image_generator/", "image_")
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
