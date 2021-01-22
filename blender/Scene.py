@@ -84,10 +84,15 @@ class RandomScene:
         result = get_rec(scene, camera, box, keep_all=False)
         return result
 
-    def annotate(self):
-        points_eaf = self.get_annotation_chimney()
-        points_cheminee = self.get_annotation_protection()
+    def annotate_ok(self):
+        points_cheminee = self.get_annotation_chimney()
+        points_eaf = self.get_annotation_protection()
         return (
             {"points": points_eaf, "label": "eaf", "difficult": 0},
             {"points": points_cheminee, "label": "cheminee", "difficult": 0},
         )
+
+    def annotate_ko(self):
+        points_cheminee = self.get_annotation_chimney()
+        return ({"points": points_cheminee, "label": "cheminee", "difficult": 0},)
+

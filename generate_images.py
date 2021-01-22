@@ -19,6 +19,10 @@ def generate_image(path, has_protection=True):
     else:
         s.generate_scene_no_EAF()
     s.prepare_camera()
+    if has_protection:
+        print(s.annotate_ok())
+    else:
+        print(s.annotate_ko())
     s.render(path)
 
 
