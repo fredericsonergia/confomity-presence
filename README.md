@@ -1,1 +1,1 @@
-blender --background --python main.py
+blender --background --python generate_images.py
