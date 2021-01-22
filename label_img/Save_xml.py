@@ -1,7 +1,7 @@
 import os
-from .Pascal_writer import PascalVocWriter
-from .utils import convertPoints2BndBox
-from PIL import Image
+from Pascal_writer import PascalVocWriter
+from label_utils import convertPoints2BndBox
+import cv2
 
 
 class Save_Xml:
@@ -22,9 +22,8 @@ class Save_Xml:
         imgFolderPath = os.path.dirname(imagePath)
         imgFolderName = os.path.split(imgFolderPath)[-1]
         imgFileName = os.path.basename(imagePath)
-        image = Image.open(imagePath)
-        width, height = image.size
-        imageShape = [height, width, 3]
+        image = cv2.imread(imagePath)
+        imageShape = image.shape
         writer = PascalVocWriter(
             imgFolderName, imgFileName, imageShape, localImgPath=imagePath
         )

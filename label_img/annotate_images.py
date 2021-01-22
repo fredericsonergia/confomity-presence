@@ -1,7 +1,7 @@
-from label_img.Save_xml import Save_Xml
+from Save_xml import Save_Xml
 
 
-def main(shapes, filename, image_path):
+def create_annotation_file(shapes, filename, image_path):
     path = "Annotations/" + filename + ".xml"
     saver = Save_Xml()
     saver.savePascalVocFormat(path, shapes, image_path)
@@ -22,4 +22,4 @@ if __name__ == "__main__":
     )
     filename = "test1"
     image_path = "./Images/rectangle.jpg"
-    main(shapes, filename, image_path)
+    create_annotation_file(shapes, filename, image_path)
