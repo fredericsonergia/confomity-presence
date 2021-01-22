@@ -47,6 +47,16 @@ def dichotomie_find_max_z(scene, camera, x, y):
     return m
 
 
+def index_of_max_y(list):
+    max = -float("inf")
+    max_index = None
+    for i, el in enumerate(list):
+        if el[1] > max:
+            max = el[1]
+            max_index = i
+    return max_index
+
+
 def get_2d_coor(scene, camera, co):
     co_2d = bpy_extras.object_utils.world_to_camera_view(  # pylint: disable=assignment-from-no-return
         scene, camera, co
@@ -62,7 +72,7 @@ def get_2d_coor(scene, camera, co):
     )
 
 
-def get_max_rec(scene, camera, box):
+def get_rec(scene, camera, box, keep_all=True):
     bottom_vects = []
     top_vects = []
     for i in range(0, len(box), 2):
@@ -71,22 +81,34 @@ def get_max_rec(scene, camera, box):
     for i in range(1, len(box), 2):
         vector = box[i]
         max_z = dichotomie_find_max_z(scene, camera, vector.x, vector.y)
-        vector.z = max_z
+        if vector.z > max_z:
+            vector.z = max_z
         top_vects.append(get_2d_coor(scene, camera, vector))
+
+    if not keep_all:
+        for _ in range(len(top_vects) // 2):
+            index = index_of_max_y(top_vects)
+            top_vects.pop(index)
+            bottom_vects.pop(index)
+
     min_x, min_y, max_x, max_y = float("inf"), float("inf"), 0, 0
     for point in bottom_vects:
         if point[0] > max_x:
             max_x = point[0]
         if point[0] < min_x:
-            min_x = point[0]
+            min_x = max(point[0], 0)
         if point[1] < min_y:
-            min_y = point[1]
+            min_y = max(point[1], 0)
+        if point[1] > max_y:
+            max_y = point[1]
     for point in top_vects:
         if point[0] > max_x:
             max_x = point[0]
         if point[0] < min_x:
-            min_x = point[0]
+            min_x = max(point[0], 0)
         if point[1] > max_y:
             max_y = point[1]
+        if point[1] < min_y:
+            min_y = max(point[1], 0)
     return [(min_x, min_y), (min_x, max_y), (max_x, max_y), (max_x, min_y)]
 

@@ -2,7 +2,7 @@ import bpy
 import random
 
 
-class Random_Protection:
+class RandomProtection:
     def __init__(self):
         self.number_of_edges = 4
         self.verts = []
@@ -46,3 +46,6 @@ class Random_Protection:
         mesh.from_pydata(self.verts, [], self.faces)
         bpy.ops.object.modifier_add(type="SOLIDIFY")
         bpy.context.object.modifiers["Solidify"].thickness = 0.11
+
+    def get_vert(self):
+        return self.verts

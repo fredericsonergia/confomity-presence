@@ -4,18 +4,18 @@ import sys
 
 sys.path.append("./blender")
 
-from Scene import Scene  # pylint: disable=import-error
+from Scene import SceneFactory  # pylint: disable=import-error
 
 
 def generate_image(path, has_protection=True):
-    s = Scene()
+    s = SceneFactory().createRandomScene()
     s.clear()
     if has_protection:
         s.generate_scene_EAF()
     else:
         s.generate_scene_no_EAF()
     s.prepare_camera()
-    s.get_annotation_chimney()
+    print(s.annotate())
     s.render(path)
 
 

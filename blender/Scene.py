@@ -3,19 +3,24 @@ import bpy_extras
 import mathutils
 
 from Room import Ground
-from Protection import Random_Protection
+from Protection import RandomProtection
 from Light import Light
 from Chimney import ChimneyFactory
 from Camera import Camera
 
-from utils import get_max_rec
+from utils import get_rec
 
 
-class Scene:
+class SceneFactory:
+    def createRandomScene(self):
+        return RandomScene()
+
+
+class RandomScene:
     def __init__(self):
         self.ground = Ground()
         self.chimney = ChimneyFactory().createRandomChimney()
-        self.protection = Random_Protection()
+        self.protection = RandomProtection()
         self.light = Light()
         self.camera = Camera()
 
@@ -37,7 +42,7 @@ class Scene:
 
     def render(self, filePath):
         self.camera.prepare_render(filePath)
-        self.camera.render()
+        # self.camera.render()
 
     def clear(self):
         bpy.ops.object.select_all(action="SELECT")
@@ -66,13 +71,22 @@ class Scene:
         scene = bpy.context.scene
         camera = bpy.data.objects["Camera"]
         box = self.chimney.get_box()
-        result = get_max_rec(scene, camera, box)
-        print(result)
+        result = get_rec(scene, camera, box)
+        return result
+
+    def get_annotation_protection(self):
+        scene = bpy.context.scene
+        camera = bpy.data.objects["Camera"]
+        coors = self.protection.get_vert()
+        box = []
+        for coor in coors:
+            box.append(mathutils.Vector(coor))
+        result = get_rec(scene, camera, box, keep_all=False)
         return result
 
     def annotate(self):
-        points_eaf = [(1, 0), (0, 0), (0, 1), (1, 1)]
-        points_cheminee = [(2, 0), (0, 0), (0, 2), (2, 2)]
+        points_eaf = self.get_annotation_chimney()
+        points_cheminee = self.get_annotation_protection()
         return (
             {"points": points_eaf, "label": "eaf", "difficult": 0},
             {"points": points_cheminee, "label": "cheminee", "difficult": 0},

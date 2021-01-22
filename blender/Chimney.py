@@ -9,7 +9,7 @@ class ChimneyFactory:
         if random_type == "cuboid":
             return CubicChimney()
         elif random_type == "cylinder":
-            return CubicChimney()
+            return RoundChimney()
 
     def createRoundChimney(self, size, loc, vertices):
         return RoundChimney(size, loc, vertices)
@@ -43,6 +43,9 @@ class CubicChimney:
         bpy.ops.object.select_all(action="DESELECT")
         obj = bpy.data.objects["Cube.001"]
         points = [vert.co for vert in obj.data.vertices]
+        for point in points:
+            if point.z < 0:
+                point.z = 0
         return points
 
 
@@ -75,6 +78,9 @@ class RoundChimney:
         bpy.ops.object.select_all(action="DESELECT")
         obj = bpy.data.objects["Cylinder"]
         points = [vert.co for vert in obj.data.vertices]
+        for point in points:
+            if point.z < 0:
+                point.z = 0
         return points
 
 
