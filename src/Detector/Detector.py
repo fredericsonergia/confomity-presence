@@ -82,13 +82,9 @@ class ModelBasedDetector(BaseDetector):
         net.load_parameters(name_model)
         return cls(net=net, thresh=thresh)
 
-    def set_prefix(self, prefix):
-        self.save_prefix =prefix
-
-
-    def set_dataset(self):
-        self.train_dataset = VOCLike(root=self.data_path, splits=[(2021, 'trainval')])
-        self.val_dataset = VOCLike(root=self.data_path, splits=[(2021, 'test')])
+    def set_dataset(self, split=2021):
+        self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'trainval')])
+        self.val_dataset = VOCLike(root=self.data_path, splits=[(split, 'test')])
         self.train_data = self.train_dataloader(self.net, self.train_dataset)
         self.val_data = self.val_dataloader(self.val_dataset)
         self.loss_val_data = self.train_dataloader(self.net, self.val_dataset)

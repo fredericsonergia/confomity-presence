@@ -1,4 +1,5 @@
 from flask import Flask,request, Response, jsonify
+from flask_cors import cross_origin, CORS
 import io
 from base64 import encodebytes
 from PIL import Image
@@ -12,8 +13,9 @@ from Detector import ModelBasedDetector
 sys.path.append('/utils')
 from get_results import process_output_img
 
-
 app = Flask(__name__)                  #  Create a Flask WSGI application
+cors = CORS(app, resources={
+            r"/predict": {"origins": "http://localhost:8888"}})
 MODEL_FOLDER = os.path.dirname(os.path.abspath(__file__)) + '/models/'
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__)) + '/uploads/'
 OUTPUT_FOLDER = os.path.dirname(os.path.abspath(__file__)) + '/outputs/'
@@ -25,6 +27,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def configure_app(flask_app):
+    flask_app.config["CORS_HEADERS"] = "Content-Type"
     flask_app.config['MODEL_FOLDER'] = MODEL_FOLDER
     flask_app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     flask_app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
