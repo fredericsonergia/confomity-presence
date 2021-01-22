@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("./blender")
 
-from Scene import SceneFactory  # pylint: disable=import-error
+from Scene import SceneFactory
 
 
 def generate_image(path, has_protection=True):
@@ -28,6 +28,6 @@ def generate_set(number_of_ok, number_of_ko, path, file_name_template):
 
 if __name__ == "__main__":
     start = time.time()
-    generate_image("/Users/matthieu/Documents/Project3/image_generator/rectangle.jpg")
+    generate_image("/Users/matthieu/Documents/Project3/presence/Images/rectangle.jpg")
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
