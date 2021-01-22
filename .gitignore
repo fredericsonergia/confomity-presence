@@ -1,7 +1,7 @@
 Data
 src/EAF
 .vscode
-models
+src/models
 src/EAF_2labels
 notebook
 .DS_Store
@@ -14,3 +14,5 @@ logs
 .gitlab-ci.yml
 uploads
 gluon-cv
+Tests
+Images
