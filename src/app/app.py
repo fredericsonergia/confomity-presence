@@ -14,7 +14,6 @@ sys.path.append("../Detector")
 from Detector import ModelBasedDetector
 
 sys.path.append("/utils")
-from get_results import process_output_img
 
 app = Flask(__name__)  # Create a Flask WSGI application
 cors = CORS(app, resources={r"/predict": {"origins": "http://localhost:8888"}})
@@ -35,12 +34,6 @@ def configure_app(flask_app):
     flask_app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
     flask_app.config["OUTPUT_FOLDER"] = OUTPUT_FOLDER
     flask_app.config["SERVER_NAME"] = settings.FLASK_SERVER_NAME
-    flask_app.config[
-        "SWAGGER_UI_DOC_EXPANSION"
-    ] = settings.RESTPLUS_SWAGGER_UI_DOC_EXPANSION
-    flask_app.config["RESTPLUS_VALIDATE"] = settings.RESTPLUS_VALIDATE
-    flask_app.config["RESTPLUS_MASK_SWAGGER"] = settings.RESTPLUS_MASK_SWAGGER
-    flask_app.config["ERROR_404_HELP"] = settings.RESTPLUS_ERROR_404_HELP
     flask_app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
 
 
