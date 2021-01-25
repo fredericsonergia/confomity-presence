@@ -1,4 +1,6 @@
 blender --background --python generate_images.py
-pip install --target=where_your_blender_site_packages_is lxml
-pip install --upgrade --target=/Applications/Blender.app/Contents/Resources/2.91/python/lib/python3.7/site-packages lxml
-pip install --upgrade --target=/Applications/Blender.app/Contents/Resources/2.91/python/lib/python3.7/site-packages pillow
+
+/Applications/Blender.app/Contents/Resources/2.91/python/bin/python3.7m -m ensurepip
+/Applications/Blender.app/Contents/Resources/2.91/python/bin/python3.7m -m pip install -U pip
+/Applications/Blender.app/Contents/Resources/2.91/python/bin/python3.7m -m pip install lxml
+/Applications/Blender.app/Contents/Resources/2.91/python/bin/python3.7m -m pip install opencv-python

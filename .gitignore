@@ -1,7 +1,6 @@
 Data
 src/EAF
 .vscode
-labelImg
 models
 src/EAF_2labels
 notebook
@@ -10,3 +9,9 @@ __pycache__
 notes.md
 Annotations
 Images
+inputs
+outputs
+results
+logs
+.gitlab-ci.yml
+uploads

@@ -32,6 +32,7 @@ def generate_image_and_annotation(path, annot_filename, has_protection=True):
     s.prepare_camera()
     shapes = s.annotate()
     s.render(path)
+    print("annotation")
     create_annotation_file(shapes, annot_filename, path)
 
 
@@ -45,6 +46,6 @@ def generate_set(number_of_ok, number_of_ko, path, file_name_template):
 if __name__ == "__main__":
     start = time.time()
     # generate_image("/Users/matthieu/Documents/Project3/presence/Images/rectangle.jpg")
-    # generate_image_and_annotation("./Images/rectangle.jpg", "rectangle")
+    generate_image_and_annotation("./Images/rectangle.jpg", "rectangle")
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")

@@ -1,7 +1,7 @@
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement
 import codecs
-import lxml
+from lxml import etree
 from constants import DEFAULT_ENCODING
 
 
@@ -26,10 +26,10 @@ class PascalVocWriter:
             Return a pretty-printed XML string for the Element.
         """
         rough_string = ElementTree.tostring(elem, "utf8")
-        root = lxml.etree.fromstring(rough_string)
-        return lxml.etree.tostring(
-            root, pretty_print=True, encoding=ENCODE_METHOD
-        ).replace("  ".encode(), "\t".encode())
+        root = etree.fromstring(rough_string)
+        return etree.tostring(root, pretty_print=True, encoding=ENCODE_METHOD).replace(
+            "  ".encode(), "\t".encode()
+        )
 
     def genXML(self):
         """
@@ -144,7 +144,7 @@ class PascalVocReader:
 
     def parseXML(self):
         assert self.filepath.endswith(XML_EXT), "Unsupport file format"
-        parser = lxml.etree.XMLParser(encoding=ENCODE_METHOD)
+        parser = etree.XMLParser(encoding=ENCODE_METHOD)
         xmltree = ElementTree.parse(self.filepath, parser=parser).getroot()
         try:
             verified = xmltree.attrib["verified"]
