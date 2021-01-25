@@ -80,7 +80,7 @@ class ModelBasedDetector(BaseDetector):
     def from_finetuned(cls, name_model, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
-        return cls(net=net, thresh=thresh)
+        return cls(net=net, thresh=thresh, save_prefix=save_prefix)
 
     def set_dataset(self, split=2021):
         self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'trainval')])

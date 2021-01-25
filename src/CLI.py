@@ -8,8 +8,8 @@ class Predictor(object):
         epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list = detector.train(start_epoch, epoch, save_interval)
         plot_train(epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list, save_prefix, save_plot)
 
-    def eval(self, model_name='models/ssd_512_best.params', taux_fp=0.05, save_plot=True):
-        detector = ModelBasedDetector.from_finetuned(model_name)
+    def eval(self,save_prefix='ssd_512_test2', model_name='models/ssd_512_best.params', taux_fp=0.05, save_plot=True):
+        detector = ModelBasedDetector.from_finetuned(model_name, save_prefix=save_prefix)
         detector.set_tests()
         detector.set_labels_and_scores()
         detector.eval(taux_fp, save_plot)
