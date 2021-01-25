@@ -16,9 +16,9 @@ def sph2cart(az, el, r):
 
 
 def get_area(bottom, top):
-    L = abs(top[1] - bottom[1])
-    l = abs(bottom[0] - top[0])
-    return l * L
+    long = abs(top[1] - bottom[1])
+    short = abs(bottom[0] - top[0])
+    return long * short
 
 
 def dichotomie_find_max_z(scene, camera, x, y):
@@ -72,6 +72,11 @@ def get_2d_coor(scene, camera, co):
     )
 
 
+def change_origin_from_bottom_left_to_top_left(coor, height):
+    x, y = coor
+    return (x, height - y)
+
+
 def get_rec(scene, camera, box, keep_all=True):
     bottom_vects = []
     top_vects = []
@@ -110,5 +115,11 @@ def get_rec(scene, camera, box, keep_all=True):
             max_y = point[1]
         if point[1] < min_y:
             min_y = max(point[1], 0)
-    return [(min_x, min_y), (min_x, max_y), (max_x, max_y), (max_x, min_y)]
-
+    result = []
+    for co in [(min_x, min_y), (min_x, max_y), (max_x, max_y), (max_x, min_y)]:
+        result.append(
+            change_origin_from_bottom_left_to_top_left(
+                co, scene.render.resolution_y * scene.render.resolution_percentage / 100
+            )
+        )
+    return result

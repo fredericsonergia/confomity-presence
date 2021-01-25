@@ -9,6 +9,7 @@ for path in sys.path:
 
 from Scene import SceneFactory
 from annotate_images import create_annotation_file
+from visualisation import create_visualisation
 
 
 def generate_image(path, has_protection=True):
@@ -46,6 +47,7 @@ def generate_set(number_of_ok, number_of_ko, path, file_name_template):
 if __name__ == "__main__":
     start = time.time()
     # generate_image("/Users/matthieu/Documents/Project3/presence/Images/rectangle.jpg")
-    generate_image_and_annotation("./Images/rectangle.jpg", "rectangle")
+    generate_image_and_annotation("./Images/rectangle5.jpg", "rectangle5")
+    create_visualisation()
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
