@@ -1,6 +1,7 @@
 import bpy
 import bpy_extras
 import mathutils
+import random
 
 from Room import Ground
 from Protection import RandomProtection
@@ -13,24 +14,27 @@ from utils import get_rec
 
 class SceneFactory:
     def createRandomScene(self):
-        return RandomScene()
+        random_type = random.choice(["pro", "no_pro"])
+        if random_type == "pro":
+            return SceneWithProtection()
+        else:
+            return Scene()
+
+    def createRandomSceneNoProtection(self):
+        return Scene()
+
+    def createRandomSceneWithProtection(self):
+        return SceneWithProtection()
 
 
-class RandomScene:
+class Scene:
     def __init__(self):
         self.ground = Ground()
         self.chimney = ChimneyFactory().createRandomChimney()
-        self.protection = RandomProtection()
         self.light = Light()
         self.camera = Camera()
 
-    def generate_scene_EAF(self):
-        self.ground.draw()
-        self.chimney.draw()
-        self.protection.draw()
-        self.light.draw()
-
-    def generate_scene_no_EAF(self):
+    def generate_scene(self):
         self.ground.draw()
         self.chimney.draw()
         self.light.draw()
@@ -73,6 +77,22 @@ class RandomScene:
         box = self.chimney.get_box()
         result = get_rec(scene, camera, box)
         return result
+
+    def annotate(self):
+        points_cheminee = self.get_annotation_chimney()
+        return ({"points": points_cheminee, "label": "cheminee", "difficult": 0},)
+
+
+class SceneWithProtection(Scene):
+    def __init__(self):
+        super().__init__()
+        self.protection = RandomProtection()
+
+    def generate_scene(self):
+        self.ground.draw()
+        self.chimney.draw()
+        self.protection.draw()
+        self.light.draw()
 
     def get_annotation_protection(self):
         scene = bpy.context.scene

@@ -4,50 +4,57 @@ import sys
 sys.path.append("./blender")
 sys.path.append("./label_img")
 
-for path in sys.path:
-    print(path)
-
 from Scene import SceneFactory
 from annotate_images import create_annotation_file
 from visualisation import create_visualisation
 
 
-def generate_image(path, has_protection=True):
+def generate_image(image_folder_path, filename):
+    image_path = image_folder_path + "/" + filename + ".jpg"
     s = SceneFactory().createRandomScene()
     s.clear()
-    if has_protection:
-        s.generate_scene_EAF()
-    else:
-        s.generate_scene_no_EAF()
-    s.prepare_camera()
-    s.render(path)
-
-
-def generate_image_and_annotation(path, annot_filename, has_protection=True):
-    s = SceneFactory().createRandomScene()
-    s.clear()
-    if has_protection:
-        s.generate_scene_EAF()
-    else:
-        s.generate_scene_no_EAF()
+    s.generate_scene()
     s.prepare_camera()
     shapes = s.annotate()
-    s.render(path)
+    s.render(image_path)
     print("annotation")
-    create_annotation_file(shapes, annot_filename, path)
+    create_annotation_file(shapes, filename, image_path)
 
 
-def generate_set(number_of_ok, number_of_ko, path, file_name_template):
+def generate_ok_image(image_folder_path, filename):
+    image_path = image_folder_path + "/" + filename + ".jpg"
+    s = SceneFactory().createRandomSceneWithProtection()
+    s.clear()
+    s.generate_scene()
+    s.prepare_camera()
+    shapes = s.annotate()
+    s.render(image_path)
+    print("annotation")
+    create_annotation_file(shapes, filename, image_path)
+
+
+def generate_ko_image(image_folder_path, filename):
+    image_path = image_folder_path + "/" + filename + ".jpg"
+    s = SceneFactory().createRandomSceneNoProtection()
+    s.clear()
+    s.generate_scene()
+    s.prepare_camera()
+    shapes = s.annotate()
+    s.render(image_path)
+    print("annotation")
+    create_annotation_file(shapes, filename, image_path)
+
+
+def generate_set(number_of_ok, number_of_ko, image_folder_path, file_name_template):
     for i in range(number_of_ok):
-        generate_image(path + file_name_template + "ok_" + str(i) + ".jpg")
+        generate_ok_image(image_folder_path, file_name_template + "_ok_" + str(i))
     for i in range(number_of_ko):
-        generate_image(path + file_name_template + "ko_" + str(i) + ".jpg", False)
+        generate_ko_image(image_folder_path, file_name_template + "_ko_" + str(i))
 
 
 if __name__ == "__main__":
     start = time.time()
-    # generate_image("/Users/matthieu/Documents/Project3/presence/Images/rectangle.jpg")
-    generate_image_and_annotation("./Images/rectangle5.jpg", "rectangle5")
+    generate_set(3, 3, "./Images", "test_set")
     create_visualisation()
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
