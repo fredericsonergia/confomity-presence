@@ -31,7 +31,6 @@ class Save_Xml:
         for shape in shapes:
             points = shape["points"]
             label = shape["label"]
-            # Add Chris
             difficult = int(shape["difficult"])
             bndbox = convertPoints2BndBox(points)
             writer.addBndBox(
