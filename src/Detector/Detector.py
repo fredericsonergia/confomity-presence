@@ -36,7 +36,7 @@ class BaseDetector(object):
         fpr,tpr,threshholds= roc_curve(self.y_true, self.y_scores)
         arg = np.argmax(tpr[np.argwhere(fpr < taux_fp)])
         opti_thresh = threshholds[arg]
-        print(f'seuil de confiance optimal : {opti_thresh}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
+        print(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
         roc_auc = auc(fpr, tpr)
         if save_plot:
             f =plt.figure()
@@ -51,6 +51,8 @@ class BaseDetector(object):
             plt.title("Courbe ROC pour la détection de l'EAF")
             plt.legend(loc="lower right")
             f.savefig('results/' + self.save_prefix + 'ROC_curve.png')
+        with open('logs/'+'eval.log', 'a') as log:
+            log.write(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
         self.thresh = opti_thresh
 
 class ModelBasedDetector(BaseDetector):
@@ -119,6 +121,8 @@ class ModelBasedDetector(BaseDetector):
                 y_true[i] = 1
             y_scores[i] = n_scores.asnumpy()[0][0][0]
         mean_iou = np.mean(iou_list[iou_list > 0])
+        with open('logs/'+'eval.log', 'a') as f:
+            f.write(f"L'intersection over union moyen est : {mean_iou:.3f}\n")
         self.y_true, self.y_scores, self.mean_iou = y_true, y_scores, mean_iou
 
     def set_ctx(self):
