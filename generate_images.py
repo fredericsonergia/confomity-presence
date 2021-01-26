@@ -54,7 +54,7 @@ def generate_set(number_of_ok, number_of_ko, image_folder_path, file_name_templa
 
 if __name__ == "__main__":
     start = time.time()
-    generate_set(3, 3, "./Images", "test_set")
+    generate_ok_image("./Images", "test_set")
     create_visualisation()
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
