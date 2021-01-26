@@ -7,13 +7,11 @@ def sorted_alphanumeric(data):
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
     return sorted(data, key=alphanum_key)
 
-def rename_img(path, name):
 
-    img_path = os.getcwd()  + path + '/Images/'
-    PATH_KO_LIST = sorted_alphanumeric(os.listdir(img_path))
-    for index, path_ko in enumerate(PATH_KO_LIST):
-        GENERIC_KO = name
-        os.rename(img_path+path_ko, img_path+GENERIC_KO+str(index)+'.jpg')
+def rename_img(path, name, start=1):
+    path_list = sorted_alphanumeric(os.listdir(path))
+    for index, img_path in enumerate(path_list):
+        os.rename(path+img_path, path+name+str(index+int(start))+'.jpg')
 
 
 def add_text(path):
