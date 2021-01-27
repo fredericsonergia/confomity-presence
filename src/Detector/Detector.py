@@ -50,13 +50,13 @@ class BaseDetector(object):
             plt.ylabel('True Positive Rate')
             plt.title("Courbe ROC pour la détection de l'EAF")
             plt.legend(loc="lower right")
-            f.savefig('results/' + self.save_prefix + 'ROC_curve.png')
+            f.savefig('results_ROC/' + self.save_prefix + '_ROC_curve.png')
         with open('logs/'+'eval.log', 'a') as log:
             log.write(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
         self.thresh = opti_thresh
 
 class ModelBasedDetector(BaseDetector):
-    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test2',data_path='../Data/EAF_2labels', data_path_test='../EAF_test', train_dataloader=ssd_train_dataloader, val_dataloader=ssd_val_dataloader):
+    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test',data_path='../Data/EAF_real', data_path_test='../Data/EAF_real', train_dataloader=ssd_train_dataloader, val_dataloader=ssd_val_dataloader):
         super().__init__()
         self.net = net
         self.train_dataloader = train_dataloader
@@ -80,36 +80,40 @@ class ModelBasedDetector(BaseDetector):
         return cls(net=net, data_path=data_path, save_prefix=save_prefix)
 
     @classmethod
-    def from_finetuned(cls, data_path, name_model, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
+    def from_finetuned(cls, name_model, data_path_test, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
-        return cls(net=net, data_path=data_path, save_prefix=save_prefix)
+        return cls(net=net, data_path_test=data_path_test, save_prefix=save_prefix)
 
     def set_dataset(self, split=2021):
         self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'train')])
         self.val_dataset = VOCLike(root=self.data_path, splits=[(split, 'val')])
-        self.test_dataset = VOCLike(root=self.data_path_test, splits=[(split, 'test')])
         self.train_data = self.train_dataloader(self.net, self.train_dataset)
         self.val_data = self.val_dataloader(self.val_dataset)
         self.loss_val_data = self.train_dataloader(self.net, self.val_dataset)
 
-    def set_tests(self, path_test='../Data/EAF_2labels/VOC2021/ImageSets/Main/test.txt', 
-                  path_image='../Data/EAF_2labels/VOC2021/JPEGImages/'):
+    def set_test_dataset(self, split=2021):
+                self.test_dataset = VOCLike(root=self.data_path_test, splits=[(split, 'test')])
+
+    def set_tests(self):
+        path_test = self.data_path_test + '/VOC2021/ImageSets/Main/test.txt'
+        path_image = self.data_path_test + '/VOC2021/JPEGImages/'
         img_list = []
         with open(path_test, 'r') as f:
             readlines = f.read()
             img_list = readlines.split('\n')
         pather = lambda x: path_image + x +'.jpg'
         img_list = list(map(pather, img_list))
+        print(img_list)
         self.tests_set = img_list
 
     def set_labels_and_scores(self):
-        self.set_dataset()
+        self.set_test_dataset()
         transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
-        test_true = self.val_dataset.transform(transf)
-        y_true= np.zeros((len(self.val_dataset)))
-        y_scores = np.zeros((len(self.val_dataset)))
-        iou_list = np.zeros((len(self.val_dataset)))
+        test_true = self.test_dataset.transform(transf)
+        y_true= np.zeros((len(self.test_dataset)))
+        y_scores = np.zeros((len(self.test_dataset)))
+        iou_list = np.zeros((len(self.test_dataset)))
         x_list_test, _ = gcv.data.transforms.presets.ssd.load_test(self.tests_set, 512)
         for i, (x, data) in enumerate(zip(x_list_test, test_true)):
             _, label, _ = data

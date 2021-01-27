@@ -182,4 +182,4 @@ def plot_train(
     plt.xlabel("epoch")
     plt.title("MAP for eaf")
     if save_plot:
-        f.savefig("results/" + save_prefix + "train_curves.png")
+        f.savefig("results_train/" + save_prefix + "_train_curves.png")

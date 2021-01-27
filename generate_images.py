@@ -66,11 +66,11 @@ def generate_ko_image(image_folder_path, filename, annot_path):
     create_annotation_file(shapes, filename, image_path, annot_path)
 
 
-def generate_set(number_of_ok, number_of_ko, image_folder_path, annot_path, file_name_template):
+def generate_set(number_of_ok, number_of_ko, image_folder_path, annot_path, file_name_template, start=0):
     for i in range(number_of_ok):
-        generate_ok_image(image_folder_path, file_name_template + "_ok_" + str(i), annot_path)
+        generate_ok_image(image_folder_path, file_name_template + "_ok_" + str(start+i), annot_path)
     for i in range(number_of_ko):
-        generate_ko_image(image_folder_path, file_name_template + "_ko_" + str(i), annot_path)
+        generate_ko_image(image_folder_path, file_name_template + "_ko_" + str(start+i), annot_path)
 
 def write_txt(filename, txt_path, files):
     if os.path.exists(txt_path+filename):
@@ -104,9 +104,10 @@ def generate_train_folder(root_name, number_of_ok, number_of_ko, image_folder_pa
     generate_set(number_of_ko, number_of_ko, image_folder_path, annot_path, "EAF")
 
 class Datagenerator:
-    def __init__(self, root_name):
+    def __init__(self, root_name, start, filename='EAF'):
         self.root_name = root_name
-        self.filename_template = "EAF"
+        self.filename_template = filename
+        self.start = start
         self.image_folder_path = self.root_name + '/VOC2021' + '/JPEGImages/'
         self.annot_path =  self.root_name+ '/VOC2021' +'/Annotations/'
         self.txt_path = self.root_name + '/VOC2021' +'/ImageSets/Main/'
@@ -133,7 +134,7 @@ class Datagenerator:
         write_txt('test.txt', self.txt_path, stest_files)
 
     def generate_folder(self, number_of_ok, number_of_ko):
-        generate_set(number_of_ko, number_of_ko, self.image_folder_path, self.annot_path, self.filename_template)
+        generate_set(number_of_ko, number_of_ko, self.image_folder_path, self.annot_path, self.filename_template, self.start)
 
 def test_generation():
     test_gen = Datagenerator('EAF_test')
@@ -142,7 +143,7 @@ def test_generation():
     test_gen.create_test_set()
 
 def train_generation(number_ok, number_ko):
-    gen = Datagenerator('EAF')
+    gen = Datagenerator('EAF', 10)
     gen.create_folder()
     gen.generate_folder(number_ok, number_ko)
     gen.create_train_sets(0.3)
@@ -151,9 +152,7 @@ if __name__ == "__main__":
     start = time.time()
     #test_generation()
     #delete_all_files('EAF')
-    #train_generation(10,10)
-    gen = Datagenerator('EAF')
-    gen.create_train_sets(0.3)
+    train_generation(10,10)
     #generate_set(3, 3, "./Images", './Annotations/',"test_set")
     #create_visualisation()
     end = time.time()
