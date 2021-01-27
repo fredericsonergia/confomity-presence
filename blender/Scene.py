@@ -9,7 +9,7 @@ from Light import Light
 from Chimney import ChimneyFactory
 from Camera import Camera
 
-from utils import get_rec
+from utils import get_annot_chimney, get_annot_protection
 
 
 class SceneFactory:
@@ -75,7 +75,7 @@ class Scene:
         scene = bpy.context.scene
         camera = bpy.data.objects["Camera"]
         box = self.chimney.get_box()
-        result = get_rec(scene, camera, box)
+        result = get_annot_chimney(scene, camera, box)
         return result
 
     def annotate(self):
@@ -101,7 +101,7 @@ class SceneWithProtection(Scene):
         box = []
         for coor in coors:
             box.append(mathutils.Vector(coor))
-        result = get_rec(scene, camera, box, keep_all=False)
+        result = get_annot_protection(scene, camera, box)
         return result
 
     def annotate(self):
