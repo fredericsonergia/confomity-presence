@@ -32,11 +32,18 @@ class Camera:
     def setup_format(self):
         print("setting up format")
         bpy.context.scene.render.engine = "CYCLES"
+        try:
+            bpy.context.scene.cycles.device = "GPU"
+            bpy.context.scene.render.tile_x = 128
+            bpy.context.scene.render.tile_y = 128
+        except:
+            print("no GPU")
         bpy.context.scene.render.image_settings.color_mode = "RGB"
         # bpy.context.scene.render.resolution_percentage = 25
         bpy.context.scene.render.resolution_x = 512
         bpy.context.scene.render.resolution_y = 512
         bpy.context.scene.render.image_settings.file_format = "JPEG"
+        bpy.context.scene.cycles.use_adaptive_sampling = True
 
     def prepare_render(self, path):
         print("preparing render")
