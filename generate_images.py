@@ -155,5 +155,7 @@ if __name__ == "__main__":
     train_generation(10,10)
     #generate_set(3, 3, "./Images", './Annotations/',"test_set")
     #create_visualisation()
+    # generate_ok_image("./Images", "test_set4")
+    # create_visualisation()
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
