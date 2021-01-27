@@ -12,7 +12,8 @@ Images
 Visualisations
 inputs
 outputs
-results
+results_train
+results_ROC
 logs
 .gitlab-ci.yml
 uploads
