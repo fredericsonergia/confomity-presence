@@ -114,7 +114,7 @@ def validate(net, val_data, ctx, eval_metric, flip_test=False):
     return eval_metric.get()
 
 
-def save_params(net, best_map, current_map, epoch, save_interval=5, prefix="ssd_512"):
+def save_params(net, best_map, current_map, epoch, prefix="ssd_512"):
     """
     save parameters of the networks
     """
@@ -124,10 +124,6 @@ def save_params(net, best_map, current_map, epoch, save_interval=5, prefix="ssd_
         net.save_parameters("models/{:s}_best.params".format(prefix))
         with open("logs/" + prefix + "_best_map.log", "a") as f:
             f.write("{:04d}:\t{:.4f}\n".format(epoch, current_map))
-    if save_interval and epoch % save_interval == 0:
-        net.save_parameters(
-            "models/{:s}_{:04d}_{:.4f}.params".format(prefix, epoch, current_map)
-        )
 
 
 def get_ctx():
@@ -168,6 +164,6 @@ def val_loss(net, val_data, ctx):
         # by batch-size anymore
         ce_metric_val.update(0, [l * batch_size for l in cls_loss])
         smoothl1_metric_val.update(0, [l * batch_size for l in box_loss])
-        name1, val_loss1 = ce_metric_val.get()
-        name2, val_loss2 = smoothl1_metric_val.get()
+    name1, val_loss1 = ce_metric_val.get()
+    name2, val_loss2 = smoothl1_metric_val.get()
     return val_loss1, val_loss2

@@ -52,11 +52,13 @@ class BaseDetector(object):
             plt.legend(loc="lower right")
             f.savefig('results_ROC/' + self.save_prefix + '_ROC_curve.png')
         with open('logs/'+'eval.log', 'a') as log:
-            log.write(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
+            log.write(f'modèle: {self.save_prefix} \n seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp} \n')
         self.thresh = opti_thresh
 
 class ModelBasedDetector(BaseDetector):
-    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test',data_path='../Data/EAF_real', data_path_test='../Data/EAF_real', train_dataloader=ssd_train_dataloader, val_dataloader=ssd_val_dataloader):
+    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test',data_path='../Data/EAF_real',
+                 data_path_test='../Data/EAF_real', train_dataloader=ssd_train_dataloader,
+                 val_dataloader=ssd_val_dataloader, batch_size=10):
         super().__init__()
         self.net = net
         self.train_dataloader = train_dataloader
@@ -73,27 +75,28 @@ class ModelBasedDetector(BaseDetector):
         self.data_path_test = data_path_test
         self.mean_iou = None
         self.ctx = None
+        self.batch_size = batch_size
     
     @classmethod
-    def from_pretrained(cls, data_path, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
+    def from_pretrained(cls, data_path, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
-        return cls(net=net, data_path=data_path, save_prefix=save_prefix)
+        return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size)
 
     @classmethod
-    def from_finetuned(cls, name_model, data_path_test, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
+    def from_finetuned(cls, name_model, data_path_test, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
-        return cls(net=net, data_path_test=data_path_test, save_prefix=save_prefix)
+        return cls(net=net, data_path_test=data_path_test, save_prefix=save_prefix, batch_size=batch_size)
 
     def set_dataset(self, split=2021):
         self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'train')])
         self.val_dataset = VOCLike(root=self.data_path, splits=[(split, 'val')])
-        self.train_data = self.train_dataloader(self.net, self.train_dataset)
-        self.val_data = self.val_dataloader(self.val_dataset)
-        self.loss_val_data = self.train_dataloader(self.net, self.val_dataset)
+        self.train_data = self.train_dataloader(self.net, self.train_dataset, batch_size=self.batch_size)
+        self.val_data = self.val_dataloader(self.val_dataset, batch_size=self.batch_size)
+        self.loss_val_data = self.train_dataloader(self.net, self.val_dataset, batch_size=self.batch_size)
 
     def set_test_dataset(self, split=2021):
-                self.test_dataset = VOCLike(root=self.data_path_test, splits=[(split, 'test')])
+        self.test_dataset = VOCLike(root=self.data_path_test, splits=[(split, 'test')])
 
     def set_tests(self):
         path_test = self.data_path_test + '/VOC2021/ImageSets/Main/test.txt'
@@ -138,7 +141,8 @@ class ModelBasedDetector(BaseDetector):
         except:
             self.ctx = [mx.cpu()]
 
-    def train(self, start_epoch, epoch, save_interval):
+    def train(self, start_epoch, epoch):
+        print(self.batch_size)
         self.set_ctx()
         self.set_dataset()
         logging.basicConfig()
@@ -150,7 +154,7 @@ class ModelBasedDetector(BaseDetector):
             os.makedirs(log_dir)
         fh = logging.FileHandler(log_file_path)
         logger.addHandler(fh)
-        logger.info(f'save_prefix={self.save_prefix}, start_epoch={start_epoch}, epoch={epoch}, save_interval={save_interval}')
+        logger.info(f'save_prefix={self.save_prefix}, start_epoch={start_epoch}, epoch={epoch}')
         logger.info('Start training from [Epoch {}]'.format(start_epoch))
         best_map = [0]
         epochs = np.arange(int(epoch))
@@ -206,6 +210,9 @@ class ModelBasedDetector(BaseDetector):
             loss1_val, loss2_val = val_loss(self.net, self.loss_val_data, self.ctx)
             ce_loss_val.append(loss1_val)
             smooth_loss_val.append(loss2_val)
+            if ce_loss_val[-1]>ce_loss_val[-2]:
+                print('Early stopping')
+                return
             ce_loss_list.append(np.mean(ce_list))
             logger.info('[Epoch {}] Validation, {}={:.3f}, {}={:.3f}'.format(
                 epoch, name1, loss1_val, name2, loss2_val))
@@ -214,7 +221,7 @@ class ModelBasedDetector(BaseDetector):
             map_name, mean_ap = validate(self.net, self.val_data, self.ctx, eval_metric)
             val_msg = '\n'.join(['{}={}'.format(k, v) for k, v in zip(map_name, mean_ap)])
             current_map = mean_ap[1]
-            save_params(self.net, best_map, current_map, epoch, int(save_interval), self.save_prefix)
+            save_params(self.net, best_map, current_map, epoch, self.save_prefix)
             map_list.append(current_map)
             logger.info('[Epoch {}] Validation: \n{}'.format(epoch, val_msg))
         return epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list

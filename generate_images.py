@@ -101,10 +101,10 @@ def delete_all_files(root_name):
     delete_files(root_name, '/VOC2021/ImageSets/Main')
 
 def generate_train_folder(root_name, number_of_ok, number_of_ko, image_folder_path, annot_path, file_name_template):
-    generate_set(number_of_ko, number_of_ko, image_folder_path, annot_path, "EAF")
+    generate_set(number_of_ok, number_of_ko, image_folder_path, annot_path, "EAF")
 
 class Datagenerator:
-    def __init__(self, root_name, start, filename='EAF'):
+    def __init__(self, root_name, start=0, filename='EAF'):
         self.root_name = root_name
         self.filename_template = filename
         self.start = start
@@ -125,37 +125,39 @@ class Datagenerator:
         lr_path = random.sample(l_path,len(l_path))
         val_files = lr_path[: round(proportion_val*len(lr_path))]
         train_files = lr_path[round(proportion_val*len(lr_path)):]
+        delete_files(self.root_name, '/VOC2021/ImageSets/Main')
         write_txt('train.txt', self.txt_path, train_files)
         write_txt('val.txt', self.txt_path, val_files)
     
     def create_test_set(self):
         test_files = os.listdir(self.image_folder_path)
         stest_files = sorted_alphanumeric(test_files)
+        delete_files(self.root_name, '/VOC2021/ImageSets/Main')
         write_txt('test.txt', self.txt_path, stest_files)
 
     def generate_folder(self, number_of_ok, number_of_ko):
         generate_set(number_of_ko, number_of_ko, self.image_folder_path, self.annot_path, self.filename_template, self.start)
 
 def test_generation():
-    test_gen = Datagenerator('EAF_test')
+    test_gen = Datagenerator('./Data/EAF_test', 20)
     test_gen.create_folder()
-    test_gen.generate_folder(20,20)
+    test_gen.generate_folder(30,30)
     test_gen.create_test_set()
 
-def train_generation(number_ok, number_ko):
-    gen = Datagenerator('EAF', 10)
+def train_generation(number_ok, number_ko, start):
+    gen = Datagenerator('./Data/EAF_false', start)
     gen.create_folder()
     gen.generate_folder(number_ok, number_ko)
     gen.create_train_sets(0.3)
 
 if __name__ == "__main__":
     start = time.time()
-    #test_generation()
-    #delete_all_files('EAF')
-    train_generation(10,10)
+    test_generation()
+    #delete_all_files('./Data/EAF_false')
+    #train_generation(300, 300, 200)
     #generate_set(3, 3, "./Images", './Annotations/',"test_set")
     #create_visualisation()
-    # generate_ok_image("./Images", "test_set4")
-    # create_visualisation()
+    #generate_ok_image("./Images", "test_set4", "./Annotations/")
+    #create_visualisation()
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")

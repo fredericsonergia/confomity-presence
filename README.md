@@ -3,9 +3,12 @@
 /Applications/Blender.app/Contents/Resources/2.91/python/bin/python3.7m -m pip install lxml
 /Applications/Blender.app/Contents/Resources/2.91/python/bin/python3.7m -m pip install opencv-python
 
-blender --background --python generate_images.py
-# environnement
 
+# generation d'image
+blender --background --python generate_images.py
+
+
+# environnement
 ## create
 
 conda env create -f environment.yml
