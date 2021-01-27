@@ -1,6 +1,6 @@
 import argparse
 from Detector.Detector import ModelBasedDetector
-from utils.get_results import plot_train
+from detector_utils.get_results import plot_train
 parser = argparse.ArgumentParser(
     description="do training"
 )

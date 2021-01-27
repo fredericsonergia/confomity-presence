@@ -1,5 +1,5 @@
 import argparse
-from utils.get_results import load_model, get_ouput_model, get_prediction, process_output_img
+from detector_utils.get_results import load_model, get_ouput_model, get_prediction, process_output_img
 parser = argparse.ArgumentParser(
     description="evaluate a model"
 )

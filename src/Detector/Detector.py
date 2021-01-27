@@ -13,12 +13,12 @@ from gluoncv import utils
 from mxnet import nd
 from sklearn.metrics import roc_curve, auc
 try:
-    sys.path.append('../utils')
+    sys.path.append('../detector_utils')
     from trainer import (VOCLike, get_pretrained_model,
                                     ssd_train_dataloader, ssd_val_dataloader,
                                     validate, save_params, get_ctx, val_loss)
 except:
-    from utils.trainer import (VOCLike, get_pretrained_model,
+    from detector_utils.trainer import (VOCLike, get_pretrained_model,
                                     ssd_train_dataloader, ssd_val_dataloader,
                                     validate, save_params, get_ctx, val_loss)
 CLASSES = ['cheminee', 'eaf']
@@ -56,7 +56,7 @@ class BaseDetector(object):
         self.thresh = opti_thresh
 
 class ModelBasedDetector(BaseDetector):
-    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test2',data_path='../Data/EAF_2labels', train_dataloader=ssd_train_dataloader, val_dataloader=ssd_val_dataloader):
+    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test2',data_path='../Data/EAF_2labels', data_path_test='../EAF_test', train_dataloader=ssd_train_dataloader, val_dataloader=ssd_val_dataloader):
         super().__init__()
         self.net = net
         self.train_dataloader = train_dataloader
@@ -70,23 +70,25 @@ class ModelBasedDetector(BaseDetector):
         self.save_prefix = save_prefix
         self.tests_set = None
         self.data_path = data_path
+        self.data_path_test = data_path_test
         self.mean_iou = None
         self.ctx = None
     
     @classmethod
-    def from_pretrained(cls, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
+    def from_pretrained(cls, data_path, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
-        return cls(net=net)
+        return cls(net=net, data_path=data_path, save_prefix=save_prefix)
 
     @classmethod
-    def from_finetuned(cls, name_model, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
+    def from_finetuned(cls, data_path, name_model, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
-        return cls(net=net, thresh=thresh, save_prefix=save_prefix)
+        return cls(net=net, data_path=data_path, save_prefix=save_prefix)
 
     def set_dataset(self, split=2021):
-        self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'trainval')])
-        self.val_dataset = VOCLike(root=self.data_path, splits=[(split, 'test')])
+        self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'train')])
+        self.val_dataset = VOCLike(root=self.data_path, splits=[(split, 'val')])
+        self.test_dataset = VOCLike(root=self.data_path_test, splits=[(split, 'test')])
         self.train_data = self.train_dataloader(self.net, self.train_dataset)
         self.val_data = self.val_dataloader(self.val_dataset)
         self.loss_val_data = self.train_dataloader(self.net, self.val_dataset)

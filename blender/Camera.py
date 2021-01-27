@@ -22,7 +22,11 @@ class Camera:
         bpy.context.object.data.lens = 18
 
     def update(self, distance=8.0):
-        camera = bpy.data.objects["Camera"]
+        print(bpy.data.objects)
+        try:
+            camera = bpy.data.objects["Camera"]
+        except:
+            camera = bpy.data.objects[0]
         looking_direction = camera.location - self.focus_point
         rot_quat = looking_direction.to_track_quat("Z", "Y")
         camera.rotation_euler = rot_quat.to_euler()

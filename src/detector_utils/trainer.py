@@ -168,6 +168,6 @@ def val_loss(net, val_data, ctx):
         # by batch-size anymore
         ce_metric_val.update(0, [l * batch_size for l in cls_loss])
         smoothl1_metric_val.update(0, [l * batch_size for l in box_loss])
-        name1, loss1 = ce_metric_val.get()
-        name2, loss2 = smoothl1_metric_val.get()
-    return loss1, loss2
+        name1, val_loss1 = ce_metric_val.get()
+        name2, val_loss2 = smoothl1_metric_val.get()
+    return val_loss1, val_loss2
