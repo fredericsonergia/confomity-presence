@@ -20,6 +20,7 @@ class Camera:
         )
         bpy.context.scene.camera = bpy.context.object
         bpy.context.object.data.lens = 18
+        bpy.context.object.data.clip_start = 1e-06
 
     def update(self, distance=8.0):
         camera = bpy.data.objects["Camera"]
@@ -32,7 +33,9 @@ class Camera:
         print("setting up format")
         bpy.context.scene.render.engine = "CYCLES"
         bpy.context.scene.render.image_settings.color_mode = "RGB"
-        bpy.context.scene.render.resolution_percentage = 25
+        # bpy.context.scene.render.resolution_percentage = 25
+        bpy.context.scene.render.resolution_x = 512
+        bpy.context.scene.render.resolution_y = 512
         bpy.context.scene.render.image_settings.file_format = "JPEG"
 
     def prepare_render(self, path):

@@ -7,7 +7,7 @@ class ChimneyFactory:
     def createRandomChimney(self):
         random_type = random.choice(["cylinder", "cuboid"])
         if random_type == "cuboid":
-            return CubicChimney()
+            return RoundChimney()
         elif random_type == "cylinder":
             return RoundChimney()
 
@@ -25,7 +25,7 @@ class CubicChimney:
         loc=(
             (-1) ** random.randint(1, 3) * random.random() / 4,
             (-1) ** random.randint(1, 3) * random.random() / 4,
-            5,
+            3,
         ),
     ):
         self.size = size
@@ -33,9 +33,10 @@ class CubicChimney:
 
     def draw(self):
         bpy.ops.mesh.primitive_cube_add(size=1, location=self.loc)
-        bpy.context.object.scale[0] = self.size[0]
-        bpy.context.object.scale[1] = self.size[1]
-        bpy.context.object.scale[2] = 10
+        obj = bpy.data.objects["Cube.001"]
+        obj.scale[0] = self.size[0]
+        obj.scale[1] = self.size[1]
+        obj.scale[2] = 6
 
     def get_box(self):
         bpy.ops.object.select_all(action="SELECT")
@@ -46,7 +47,7 @@ class CubicChimney:
         for point in points:
             if point.z < 0:
                 point.z = 0
-        return points
+        return points.copy()
 
 
 class RoundChimney:
@@ -56,7 +57,7 @@ class RoundChimney:
         loc=(
             (-1) ** random.randint(1, 3) * random.random() / 4,
             (-1) ** random.randint(1, 3) * random.random() / 4,
-            5,
+            3,
         ),
         vertices=random.randint(3, 65),
     ):
@@ -68,9 +69,10 @@ class RoundChimney:
         bpy.ops.mesh.primitive_cylinder_add(
             vertices=self.vertices, radius=0.5, location=self.loc
         )
-        bpy.context.object.scale[0] = self.size[0]
-        bpy.context.object.scale[1] = self.size[1]
-        bpy.context.object.scale[2] = 6
+        obj = bpy.data.objects["Cylinder"]
+        obj.scale[0] = self.size[0]
+        obj.scale[1] = self.size[1]
+        obj.scale[2] = 3
 
     def get_box(self):
         bpy.ops.object.select_all(action="SELECT")
