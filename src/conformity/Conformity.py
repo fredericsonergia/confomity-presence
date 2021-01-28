@@ -101,12 +101,12 @@ class Conformity:
         """
         return self.__protection
 
-if __name__ == '__main__':
-    print("okay, brother")
-    my_conformity = Conformity("eaf2-rotate.png")
-    print("intersection",my_conformity.get_intersection())
-    print("max digit read",my_conformity.get_max_digit_read())
-    print("work sclae", my_conformity.get_ruler().get_pixel_centimeter_scale())
-    print("digits", my_conformity.get_ruler().get_digits())
-    print("distance ", my_conformity.get_distance())
+#if __name__ == '__main__':
+#    print("okay, brother")
+#    my_conformity = Conformity("eaf2-rotate.png")
+#    print("intersection",my_conformity.get_intersection())
+#    print("max digit read",my_conformity.get_max_digit_read())
+#    print("work sclae", my_conformity.get_ruler().get_pixel_centimeter_scale())
+#    print("digits", my_conformity.get_ruler().get_digits())
+#    print("distance ", my_conformity.get_distance()) 
     
