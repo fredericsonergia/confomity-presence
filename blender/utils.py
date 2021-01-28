@@ -21,32 +21,6 @@ def get_area(bottom, top):
     return long * short
 
 
-def dichotomie_find_max_z(scene, camera, x, y):
-    a = 0
-    b = 5
-    debut = a
-    fin = b
-    k = 1
-    e = 0.0001
-    # calcul de la longueur de [a,b]
-    ecart = b - a
-    while ecart > e:
-        # calcul du milieu
-        m = (debut + fin) / 2
-        co = mathutils.Vector((x, y, m))
-        top = bpy_extras.object_utils.world_to_camera_view(  # pylint: disable=assignment-from-no-return
-            scene, camera, co
-        ).y
-        if top > k:
-            # la solution est inférieure à m
-            fin = m
-        else:
-            # la solution est supérieure à m
-            debut = m
-        ecart = fin - debut
-    return m
-
-
 def index_of_max_y(list):
     max = -float("inf")
     max_index = None
@@ -119,7 +93,6 @@ def get_max_rec_from_bottom_and_top_points(bottom_vects, top_vects):
 def get_annot_chimney(scene, camera, box):
     box_2d = list(map(lambda vector: get_2d_coor(scene, camera, vector), box))
     bottom_vects, top_vects = split_into_top_bottom(box_2d)
-
     max_rectangle = get_max_rec_from_bottom_and_top_points(bottom_vects, top_vects)
     result = []
     for co in max_rectangle:
