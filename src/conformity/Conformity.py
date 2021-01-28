@@ -1,12 +1,15 @@
 from Ruler import Ruler
 from Protection import Protection
-from helpers import slope_ordinate, find_intersection, approximate_text_by_point, my_arg_max
+from Image import Image
+from helpers import slope_ordinate, find_intersection, approximate_text_by_point, my_arg_max, get_response_image
+import cv2
 
 class Conformity:
     "Class representing the conformity of a construction site"
 
     def __init__(self, imagePath:str)->None:
         """Constructor of class Conformity """
+        self.__image = Image(imagePath)
         self.__ruler = Ruler(imagePath)
         self.__protection = Protection(imagePath)
         self.__intersection = None
@@ -14,6 +17,10 @@ class Conformity:
         self.__conformity = None
         self.__max_digit_read = None
         self.__conformity_distance = 12.0
+        self.__image_path = imagePath
+        self.__ruler_axis_color=(0,255,0)
+        self.__protection_axis_color=(0,0,255)
+        self.__illustration_thickness = 3
 
     def get_intersection(self)->(float,float):
         """
@@ -100,6 +107,67 @@ class Conformity:
             @returns: protection object representing the protection on the construction site
         """
         return self.__protection
+
+    def get_image_path(self) -> str:
+        """
+            @parameters: object itself
+            @returns: a string corresponding to the path of the image
+        """
+        return self.__image_path
+
+    def get_illustration(self):
+        ruler_axis = self.__ruler.get_axis()
+        protection_axis = self.__protection.get_axis_from_edges()
+        ruler_start_point, ruler_end_point = ruler_axis
+        protection_start_point, protection_end_point = protection_axis
+        image = self.__image.get_original()
+        cv2.line(image,(int(ruler_start_point[0]), int(ruler_start_point[1])), (int(ruler_end_point[0]), int(ruler_end_point[1])), self.__ruler_axis_color, self.__illustration_thickness)
+        cv2.line(image,(int(protection_start_point[0]), int(protection_start_point[1])), (int(protection_end_point[0]), int(protection_end_point[1])), self.__protection_axis_color, self.__illustration_thickness)
+        cv2.imwrite("for_bytes",image)
+        return get_response_image("for_bytes")
+
+    def get_illustration_thickness(self)->int:
+        """
+            @parameters: object itself
+            @returns: current thickness used for axis illustration
+        """
+        return self.__illustration_thickness
+        
+    
+    def set_illustration_thickness(self, thickness:int)-> None:
+        """
+            @parameters: object itself and a thickness value
+            @returns: Nothing
+        """
+        self.__illustration_thickness = thickness
+
+    def get_ruler_axis_color(self)->(int,int,int):
+        """
+            @parameters: object itself
+            @returns: a triplet corresponding to the BGR code of the color for ruler axis drawing
+        """
+        return self.__ruler_axis_color
+    
+    def set_ruler_axis_color(self, color:(int,int,int))->None:
+        """
+            @parameters: object itself and a triplet corresponding to a BGR code
+            @returns: Nothing
+        """
+        self.__ruler_axis_color = color
+
+    def get_protection_axis_color(self)->(int,int,int):
+        """
+            @parameters: object itself
+            @returns: a triplet corresponding to the BGR code of the color for protection axis drawing
+        """
+        return self.__protection_axis_color
+
+    def set_protection_axis_color(self, color:(int,int,int))->None:
+        """
+            @parameters: object itself and a triplet corresponding to a BGR code
+            @returns: Nothing
+        """
+        self.__protection_axis_color = color
 
 #if __name__ == '__main__':
 #    print("okay, brother")

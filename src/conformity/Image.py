@@ -34,6 +34,10 @@ class Image:
     def get_resolution(self):
         return self.resolution
 
+    #Defining original getter
+    def get_original(self):
+        return self.original
+
 if __name__ == '__main__':
     print("okay, brother")
     my_image = Image("im1-rotate.png")

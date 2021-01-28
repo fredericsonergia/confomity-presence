@@ -1,4 +1,7 @@
 import numpy as np
+from PIL import Image
+import io
+from base64 import encodebytes
 
 def my_arg_max(my_list):
   """
@@ -65,5 +68,12 @@ def distance_to_line(slope,ordinate,point) -> float:
   """
   distance = abs(slope*point[0]-point[1]+ordinate)/np.sqrt(slope*slope+1)
   return distance
+
+def get_response_image(image_path):
+    pil_img = Image.open(image_path, mode="r")  # reads the PIL image
+    byte_arr = io.BytesIO()
+    pil_img.save(byte_arr, format="PNG")  # convert the PIL image to byte array
+    encoded_img = encodebytes(byte_arr.getvalue()).decode("ascii")  # encode as base64
+    return encoded_img
 
     
