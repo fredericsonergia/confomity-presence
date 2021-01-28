@@ -119,10 +119,10 @@ class SceneWithProtection(Scene):
         )
 
     def color_all(self):
-        mat1 = MaterialFactory().create_random_color()
+        mat1 = MaterialFactory().create_random_brown("chimney_color")
         chimney = self.chimney.get_object()
         mat1.add_to_object(chimney)
-        mat2 = MaterialFactory().create_random_color()
+        mat2 = MaterialFactory().create_random_brown("protection_color")
         protection = self.protection.get_object()
         mat2.add_to_object(protection)
 
