@@ -49,3 +49,6 @@ class RandomProtection:
 
     def get_vert(self):
         return self.verts
+
+    def get_object(self):
+        return bpy.data.objects["Protection"]
