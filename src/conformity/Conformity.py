@@ -1,13 +1,20 @@
 from Ruler import Ruler
 from Protection import Protection
 from Image import Image
-from helpers import slope_ordinate, find_intersection, approximate_text_by_point, my_arg_max, get_response_image
+from helpers import (
+    slope_ordinate,
+    find_intersection,
+    approximate_text_by_point,
+    my_arg_max,
+)
 import cv2
+import os
+
 
 class Conformity:
     "Class representing the conformity of a construction site"
 
-    def __init__(self, imagePath:str)->None:
+    def __init__(self, imagePath: str) -> None:
         """Constructor of class Conformity """
         self.__image = Image(imagePath)
         self.__ruler = Ruler(imagePath)
@@ -18,11 +25,11 @@ class Conformity:
         self.__max_digit_read = None
         self.__conformity_distance = 12.0
         self.__image_path = imagePath
-        self.__ruler_axis_color=(0,255,0)
-        self.__protection_axis_color=(0,0,255)
+        self.__ruler_axis_color = (0, 255, 0)
+        self.__protection_axis_color = (0, 0, 255)
         self.__illustration_thickness = 3
 
-    def get_intersection(self)->(float,float):
+    def get_intersection(self) -> (float, float):
         """
             @parameters: object itself
             @returns: point representing the intersection of ruler and protection of the object
@@ -30,34 +37,52 @@ class Conformity:
         if self.__intersection == None:
             ruler_start_point, ruler_end_point = self.__ruler.get_axis()
             print("the axis is: ", self.__ruler.get_axis())
-            print("ruler point coordinates ",ruler_start_point, ruler_end_point)
-            protection_start_point, protection_end_point = self.__protection.get_axis_from_edges()
-            print("protection point coordinates ",protection_start_point, protection_end_point)
-            ruler_slope, ruler_ordinate = slope_ordinate(ruler_start_point, ruler_end_point)
-            protection_slope, protection_ordinate = slope_ordinate(protection_start_point, protection_end_point)
-            print("ruler slope and ordinate ",ruler_slope, ruler_ordinate)
+            print("ruler point coordinates ", ruler_start_point, ruler_end_point)
+            (
+                protection_start_point,
+                protection_end_point,
+            ) = self.__protection.get_axis_from_edges()
+            print(
+                "protection point coordinates ",
+                protection_start_point,
+                protection_end_point,
+            )
+            ruler_slope, ruler_ordinate = slope_ordinate(
+                ruler_start_point, ruler_end_point
+            )
+            protection_slope, protection_ordinate = slope_ordinate(
+                protection_start_point, protection_end_point
+            )
+            print("ruler slope and ordinate ", ruler_slope, ruler_ordinate)
             print("protection_slope_ordinate", protection_slope, protection_ordinate)
-            self.__intersection = find_intersection(ruler_slope, ruler_ordinate, protection_slope, protection_ordinate)
+            self.__intersection = find_intersection(
+                ruler_slope, ruler_ordinate, protection_slope, protection_ordinate
+            )
         return self.__intersection
 
-    def get_max_digit_read(self)->(float,float):
+    def get_max_digit_read(self) -> (float, float):
         """
             @parameters: object itself
             @returns: the maximum of the digits on the ruler under the protection axis. Alongside with its ordinate.
         """
         if self.__max_digit_read == None:
             ruler_digits = self.__ruler.get_digits()
-            ruler_digits = [(element[0],approximate_text_by_point(element)[1]) for element in ruler_digits]
-            print("0: ",ruler_digits)
+            ruler_digits = [
+                (element[0], approximate_text_by_point(element)[1])
+                for element in ruler_digits
+            ]
+            print("0: ", ruler_digits)
             intersection = self.get_intersection()
-            ruler_digits = [element for element in ruler_digits if element[1] >= intersection[1]]
+            ruler_digits = [
+                element for element in ruler_digits if element[1] >= intersection[1]
+            ]
             ruler_digits_ordinates = [element[1] for element in ruler_digits]
             ruler_digits_value = [int(element[0]) for element in ruler_digits]
-            index,value = my_arg_max(ruler_digits_value)
-            self.__max_digit_read = (value,ruler_digits_ordinates[index])
+            index, value = my_arg_max(ruler_digits_value)
+            self.__max_digit_read = (value, ruler_digits_ordinates[index])
         return self.__max_digit_read
 
-    def get_distance(self)->float:
+    def get_distance(self) -> float:
         """
             @parameters: object itself
             @returns: the distance between the protection and the chimney
@@ -66,35 +91,39 @@ class Conformity:
             pixel_cm_scale = self.__ruler.get_pixel_centimeter_scale()
             intersection = self.get_intersection()
             max_digit_read = self.get_max_digit_read()
-            pix_delta_from_inter_to_max_digit = max_digit_read[1]-intersection[1]
-            cm_delta_from_inter_to_max_digit=pixel_cm_scale[1]*pix_delta_from_inter_to_max_digit/pixel_cm_scale[0]
-            self.__distance = cm_delta_from_inter_to_max_digit+max_digit_read[0]
+            pix_delta_from_inter_to_max_digit = max_digit_read[1] - intersection[1]
+            cm_delta_from_inter_to_max_digit = (
+                pixel_cm_scale[1]
+                * pix_delta_from_inter_to_max_digit
+                / pixel_cm_scale[0]
+            )
+            self.__distance = cm_delta_from_inter_to_max_digit + max_digit_read[0]
         return self.__distance
 
-    def get_conformity(self)->bool:
+    def get_conformity(self) -> bool:
         """
             @parameters: object itself
             @returns: True if conformity site is conform i.e distance > self.__minimum_distance. False otherwise.
         """
         if self.__conformity == None:
-            self.__conformity =  self.get_distance() > self.__conformity_distance
+            self.__conformity = self.get_distance() > self.__conformity_distance
         return self.__conformity
 
-    def get_conformity_distance(self)->float:
+    def get_conformity_distance(self) -> float:
         """
             @parameters: object itself
             @returns: return the current conformity distance
         """
         return self.__conformity_distance
 
-    def set_conformity_distance(self,new_distance:float)->None:
+    def set_conformity_distance(self, new_distance: float) -> None:
         """
             @parameters: object itself, and the new conformity distance
             @returns: Nothing
         """
         self.__conformity_distance = new_distance
 
-    def get_ruler(self)-> Ruler:
+    def get_ruler(self) -> Ruler:
         """
             @parameters: object itself
             @returns: ruler object coresponding to ruler on the construction site
@@ -115,66 +144,78 @@ class Conformity:
         """
         return self.__image_path
 
-    def get_illustration(self):
+    def get_illustration(self, output_image_path):
         ruler_axis = self.__ruler.get_axis()
         protection_axis = self.__protection.get_axis_from_edges()
         ruler_start_point, ruler_end_point = ruler_axis
         protection_start_point, protection_end_point = protection_axis
         image = self.__image.get_original()
-        cv2.line(image,(int(ruler_start_point[0]), int(ruler_start_point[1])), (int(ruler_end_point[0]), int(ruler_end_point[1])), self.__ruler_axis_color, self.__illustration_thickness)
-        cv2.line(image,(int(protection_start_point[0]), int(protection_start_point[1])), (int(protection_end_point[0]), int(protection_end_point[1])), self.__protection_axis_color, self.__illustration_thickness)
-        cv2.imwrite("for_bytes",image)
-        return get_response_image("for_bytes")
+        cv2.line(
+            image,
+            (int(ruler_start_point[0]), int(ruler_start_point[1])),
+            (int(ruler_end_point[0]), int(ruler_end_point[1])),
+            self.__ruler_axis_color,
+            self.__illustration_thickness,
+        )
+        cv2.line(
+            image,
+            (int(protection_start_point[0]), int(protection_start_point[1])),
+            (int(protection_end_point[0]), int(protection_end_point[1])),
+            self.__protection_axis_color,
+            self.__illustration_thickness,
+        )
+        cv2.imwrite(output_image_path, image)
+        return
 
-    def get_illustration_thickness(self)->int:
+    def get_illustration_thickness(self) -> int:
         """
             @parameters: object itself
             @returns: current thickness used for axis illustration
         """
         return self.__illustration_thickness
-        
-    
-    def set_illustration_thickness(self, thickness:int)-> None:
+
+    def set_illustration_thickness(self, thickness: int) -> None:
         """
             @parameters: object itself and a thickness value
             @returns: Nothing
         """
         self.__illustration_thickness = thickness
 
-    def get_ruler_axis_color(self)->(int,int,int):
+    def get_ruler_axis_color(self) -> (int, int, int):
         """
             @parameters: object itself
             @returns: a triplet corresponding to the BGR code of the color for ruler axis drawing
         """
         return self.__ruler_axis_color
-    
-    def set_ruler_axis_color(self, color:(int,int,int))->None:
+
+    def set_ruler_axis_color(self, color: (int, int, int)) -> None:
         """
             @parameters: object itself and a triplet corresponding to a BGR code
             @returns: Nothing
         """
         self.__ruler_axis_color = color
 
-    def get_protection_axis_color(self)->(int,int,int):
+    def get_protection_axis_color(self) -> (int, int, int):
         """
             @parameters: object itself
             @returns: a triplet corresponding to the BGR code of the color for protection axis drawing
         """
         return self.__protection_axis_color
 
-    def set_protection_axis_color(self, color:(int,int,int))->None:
+    def set_protection_axis_color(self, color: (int, int, int)) -> None:
         """
             @parameters: object itself and a triplet corresponding to a BGR code
             @returns: Nothing
         """
         self.__protection_axis_color = color
 
-#if __name__ == '__main__':
+
+# if __name__ == '__main__':
 #    print("okay, brother")
 #    my_conformity = Conformity("eaf2-rotate.png")
 #    print("intersection",my_conformity.get_intersection())
 #    print("max digit read",my_conformity.get_max_digit_read())
 #    print("work sclae", my_conformity.get_ruler().get_pixel_centimeter_scale())
 #    print("digits", my_conformity.get_ruler().get_digits())
-#    print("distance ", my_conformity.get_distance()) 
-    
+#    print("distance ", my_conformity.get_distance())
+
