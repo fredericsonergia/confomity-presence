@@ -159,7 +159,6 @@ def val_loss(net, val_data, ctx):
             sum_loss, cls_loss, box_loss = mbox_loss_val(
                 cls_preds, box_preds, cls_targets, box_targets
             )
-            autograd.backward(sum_loss)
         # since we have already normalized the loss, we don't want to normalize
         # by batch-size anymore
         ce_metric_val.update(0, [l * batch_size for l in cls_loss])

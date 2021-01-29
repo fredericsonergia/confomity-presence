@@ -136,7 +136,7 @@ class Datagenerator:
         write_txt('test.txt', self.txt_path, stest_files)
 
     def generate_folder(self, number_of_ok, number_of_ko):
-        generate_set(number_of_ko, number_of_ko, self.image_folder_path, self.annot_path, self.filename_template, self.start)
+        generate_set(number_of_ok, number_of_ko, self.image_folder_path, self.annot_path, self.filename_template, self.start)
 
 def test_generation():
     test_gen = Datagenerator('./Data/EAF_test', 20)
@@ -152,9 +152,9 @@ def train_generation(number_ok, number_ko, start):
 
 if __name__ == "__main__":
     start = time.time()
-    test_generation()
+    #test_generation()
     #delete_all_files('./Data/EAF_false')
-    #train_generation(300, 300, 200)
+    train_generation(200, 200, 200)
     #generate_set(3, 3, "./Images", './Annotations/',"test_set")
     #create_visualisation()
     #generate_ok_image("./Images", "test_set4", "./Annotations/")

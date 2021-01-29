@@ -39,3 +39,52 @@ python app.py
 python CLI.py train
 python CLI.py eval
 python CLI.py predict
+
+# Pour matthieu (entraînement et evaluate)
+
+├── Annotations
+├── Data
+│   ├── EAF_false
+│   │   └── VOC2021
+│   │       ├── Annotations
+│   │       ├── ImageSets
+│   │       │   └── Main
+│   │       └── JPEGImages
+│   ├── EAF_real
+│   │   └── VOC2021
+│   │       ├── Annotations
+│   │       ├── ImageSets
+│   │       │   └── Main
+│   │       └── JPEGImages
+│   ├── EAF_test
+│   │   └── VOC2021
+│   │       ├── Annotations
+│   │       ├── ImageSets
+│   │       │   └── Main
+│   │       └── JPEGImages
+│   ├── Photos
+│   └── Photos2
+├── Images
+├── Visualisations
+├── blender
+├── blender_test
+├── label_img
+├── notebook
+└── src
+    ├── Detector
+    ├── app
+    │   ├── api
+    │   │   └── eaf
+    │   │       └── endpoints
+    │   ├── models
+    │   ├── outputs
+    │   ├── tests
+    │   └── uploads
+    ├── detector_utils
+    ├── inputs
+    ├── logs
+    ├── models
+    ├── outputs
+    ├── results_ROC
+    ├── results_train
+    └── tests
