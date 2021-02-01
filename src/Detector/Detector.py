@@ -258,9 +258,10 @@ class ModelBasedDetector(BaseDetector):
             loss1_val, loss2_val = val_loss(self.net, self.loss_val_data, self.ctx)
             ce_loss_val.append(loss1_val)
             smooth_loss_val.append(loss2_val)
-            if ce_loss_val[-1]>ce_loss_val[-2]:
-                print('Early stopping')
-                return
+            if len(ce_loss_list) > 1 and epoch > 5:
+                if ce_loss_val[-1]>ce_loss_val[-2]:
+                    print('Early stopping')
+                    return
             ce_loss_list.append(np.mean(ce_list))
             logger.info('[Epoch {}] Validation, {}={:.3f}, {}={:.3f}'.format(
                 epoch, name1, loss1_val, name2, loss2_val))
