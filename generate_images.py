@@ -27,6 +27,7 @@ def generate_ok_image(image_folder_path, filename):
     s.clear()
     s.generate_scene()
     s.prepare_camera()
+    s.color_all()
     shapes = s.annotate()
     s.render(image_path)
     print("annotation")
@@ -54,7 +55,7 @@ def generate_set(number_of_ok, number_of_ko, image_folder_path, file_name_templa
 
 if __name__ == "__main__":
     start = time.time()
-    generate_ok_image("./Images", "test_set4")
+    generate_ok_image("./Images", "test")
     create_visualisation()
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")

@@ -49,6 +49,9 @@ class CubicChimney:
                 point.z = 0
         return points.copy()
 
+    def get_object(self):
+        return bpy.data.objects["Cube.001"]
+
 
 class RoundChimney:
     def __init__(
@@ -85,14 +88,5 @@ class RoundChimney:
                 point.z = 0
         return points
 
-
-#     def color(self):
-# bpy.ops.material.new()
-# bpy.data.materials["Material"].node_tree.nodes["Principled BSDF"].inputs[
-#     0
-# ].default_value = (
-#     random.randint(0, 256),
-#     random.randint(0, 256),
-#     random.randint(0, 256),
-#     random.random(),
-# )
+    def get_object(self):
+        return bpy.data.objects["Cylinder"]
