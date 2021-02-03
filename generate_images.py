@@ -133,7 +133,7 @@ class Datagenerator:
         test_files = os.listdir(self.image_folder_path)
         stest_files = sorted_alphanumeric(test_files)
         delete_files(self.root_name, '/VOC2021/ImageSets/Main')
-        write_txt('test.txt', self.txt_path, stest_files)
+        write_txt('test.txt', self.txt_path, test_files)
 
     def generate_folder(self, number_of_ok, number_of_ko):
         generate_set(number_of_ok, number_of_ko, self.image_folder_path, self.annot_path, self.filename_template, self.start)
@@ -145,7 +145,7 @@ def test_generation():
     test_gen.create_test_set()
 
 def train_generation(number_ok, number_ko, start):
-    gen = Datagenerator('./Data/EAF_false', start)
+    gen = Datagenerator('./Data/EAF_false400', start)
     gen.create_folder()
     gen.generate_folder(number_ok, number_ko)
     gen.create_train_sets(0.3)
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     start = time.time()
     #test_generation()
     #delete_all_files('./Data/EAF_false')
-    train_generation(200, 200, 200)
+    train_generation(200, 200, 0)
     #generate_set(3, 3, "./Images", './Annotations/',"test_set")
     #create_visualisation()
     #generate_ok_image("./Images", "test_set4", "./Annotations/")

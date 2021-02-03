@@ -12,7 +12,7 @@ from mxnet import autograd, gluon
 from gluoncv import model_zoo
 from gluoncv import utils
 from mxnet import nd
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, confusion_matrix
 try:
     sys.path.append('../detector_utils')
     from trainer import (VOCLike, get_pretrained_model,
@@ -53,6 +53,8 @@ class BaseDetector(object):
             plt.title("Courbe ROC pour la détection de l'EAF")
             plt.legend(loc="lower right")
             f.savefig('results_ROC/' + self.save_prefix + '_ROC_curve.png')
+        y_pred = np.asarray(self.y_scores >= opti_thresh).astype(int)
+        matrice_confusion = confusion_matrix(self.y_true, y_pred)
         if not os.path.exists('logs/eval.json'):
             results =  {'model':[self.save_prefix],
                         'description': [self.description_train],
@@ -61,11 +63,12 @@ class BaseDetector(object):
                         'taux_faux_positif_fixe': [taux_fp],
                         'taux_faux_negatif':[fn],
                         'taux_vrai_p': [tpr[arg]],
+                        'confusion_matrix': matrice_confusion,
                         'seuil_optimal':[opti_thresh]}
             with open('logs/eval.json', 'w') as json_file:
                 json.dump(results, json_file)
         else:
-            with open('eval.json') as f:
+            with open('logs/eval.json') as f:
                 data = json.load(f)
             data['model'].append(self.save_prefix)
             data['description'].append(self.description_train)
@@ -79,7 +82,7 @@ class BaseDetector(object):
                 json.dump(data, json_file)
             
         with open('logs/'+'eval.log', 'a') as log:
-            log.write(f"modèle: {self.save_prefix} \n description de l'entrainement: {self.description_train} \n seuil de confiance optimal : {opti_thresh:.3f}, \n on a un taux de faux positif de: {fpr[arg]} \n on a un taux de vrai positif de: {tpr[arg]} \n on a un taux de faux négatif de: {fn} \n pour la condition taux de faux positif  < {taux_fp} \n")
+            log.write(f"modèle: {self.save_prefix} \n description de l'entrainement: {self.description_train} \n seuil de confiance optimal : {opti_thresh:.3f}, \n on a un taux de faux positif de: {fpr[arg]} \n on a un taux de vrai positif de: {tpr[arg]} \n matrice de confusion: {matrice_confusion} \n on a un taux de faux négatif de: {fn} \n pour la condition taux de faux positif  < {taux_fp} \n")
         self.thresh = opti_thresh
 
 class ModelBasedDetector(BaseDetector):
@@ -258,10 +261,10 @@ class ModelBasedDetector(BaseDetector):
             loss1_val, loss2_val = val_loss(self.net, self.loss_val_data, self.ctx)
             ce_loss_val.append(loss1_val)
             smooth_loss_val.append(loss2_val)
-            if len(ce_loss_list) > 1 and epoch > 5:
-                if ce_loss_val[-1]>ce_loss_val[-2]:
-                    print('Early stopping')
-                    return
+            # if len(ce_loss_list) > 1 and epoch > 5:
+            #     if ce_loss_val[-1]>ce_loss_val[-2]:
+            #         print('Early stopping')
+            #         return
             ce_loss_list.append(np.mean(ce_list))
             logger.info('[Epoch {}] Validation, {}={:.3f}, {}={:.3f}'.format(
                 epoch, name1, loss1_val, name2, loss2_val))

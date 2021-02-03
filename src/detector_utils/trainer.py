@@ -117,6 +117,10 @@ def validate(net, val_data, ctx, eval_metric, flip_test=False):
 def save_params(net, best_map, current_map, epoch, prefix="ssd_512"):
     """
     save parameters of the networks
+    Args:
+    - net (network): the network to save
+    - best_map (list): the current best map
+    - current_map (float): the current map
     """
     current_map = float(current_map)
     if current_map > best_map[0]:
@@ -127,6 +131,9 @@ def save_params(net, best_map, current_map, epoch, prefix="ssd_512"):
 
 
 def get_ctx():
+    '''
+    get the context from mxnet
+    '''
     try:
         a = mx.nd.zeros((1,), ctx=mx.gpu(0))
         ctx = [mx.gpu(0)]
@@ -136,7 +143,13 @@ def get_ctx():
 
 
 def val_loss(net, val_data, ctx):
-    """Test on validation dataset."""
+    """
+    Test on validation dataset.
+    Args:
+    - net (gluocv network): the network to validate
+    - val_data (Dataloader, mini batch of data): the data on which we validate the model
+    - ctx (array): gpu or cpu
+    """
     mx.nd.waitall()
     net.hybridize()
     mbox_loss_val = gcv.loss.SSDMultiBoxLoss()

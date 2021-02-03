@@ -5,15 +5,16 @@
 
 
 # generation d'image
+```
 blender --background --python generate_images.py
-
+```
 
 # environnement
 ## create
-
+```
 conda env create -f environment.yml
 conda activate presence
-
+```
 ## update
 
 conda env export > environment.yml
@@ -21,15 +22,15 @@ conda env export > environment.yml
 # Entrainement
 
 ## Données
-
-└── VOC2021\n
-  ├── Annotations\n
-  ├── ImageSets\n
-  │ └── Main\n
-  │ ├── test.txt\n
-  │ └── trainval.txt\n
+```bash
+└── VOC2021
+  ├── Annotations
+  ├── ImageSets
+  │ └── Main
+  │ ├── test.txt
+  │ └── trainval.txt
   └── JPEGImages
-
+```
 # API
 
 python app.py
@@ -41,7 +42,7 @@ python CLI.py eval
 python CLI.py predict
 
 # Pour matthieu (entraînement et evaluate)
-
+```bash
 ├── Annotations
 ├── Data
 │   ├── EAF_false
@@ -88,3 +89,4 @@ python CLI.py predict
     ├── results_ROC
     ├── results_train
     └── tests
+```

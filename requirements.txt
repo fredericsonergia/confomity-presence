@@ -17,10 +17,6 @@ mxnet==1.7.0.post1
 numpy==1.19.4
 opencv-python==4.5.1.48
 pillow==8.1.0
-portalocker==2.0.0
-pyparsing==2.4.7
-python-dateutil==2.8.1
-python-graphviz==0.8.4
 requests==2.25.1
 scikit-learn==0.24.0
 scipy==1.6.0
