@@ -113,6 +113,7 @@ class Datagenerator:
         self.txt_path = self.root_name + '/VOC2021' +'/ImageSets/Main/'
 
     def create_folder(self):
+        ''' create the VOC like folder from the root_name'''
         Path(self.root_name).mkdir(parents=True, exist_ok=True)
         Path(self.root_name + '/VOC2021/').mkdir(parents=True, exist_ok=True)
         Path(self.image_folder_path).mkdir(parents=True, exist_ok=True)
@@ -120,7 +121,10 @@ class Datagenerator:
         Path(self.root_name+'/VOC2021/ImageSets/').mkdir(parents=True, exist_ok=True)
         Path(self.txt_path).mkdir(parents=True, exist_ok=True)
 
-    def create_train_sets(self,proportion_val):
+    def create_train_sets(self, proportion_val):
+        '''
+        create the text file spliting training and val
+        '''
         l_path = os.listdir(self.image_folder_path)
         lr_path = random.sample(l_path,len(l_path))
         val_files = lr_path[: round(proportion_val*len(lr_path))]
@@ -130,6 +134,9 @@ class Datagenerator:
         write_txt('val.txt', self.txt_path, val_files)
     
     def create_test_set(self):
+        '''
+        create the text file
+        '''
         test_files = os.listdir(self.image_folder_path)
         stest_files = sorted_alphanumeric(test_files)
         delete_files(self.root_name, '/VOC2021/ImageSets/Main')
@@ -139,12 +146,22 @@ class Datagenerator:
         generate_set(number_of_ok, number_of_ko, self.image_folder_path, self.annot_path, self.filename_template, self.start)
 
 def test_generation():
+    '''
+    generate a test set
+    '''
     test_gen = Datagenerator('./Data/EAF_test', 20)
     test_gen.create_folder()
     test_gen.generate_folder(30,30)
     test_gen.create_test_set()
 
 def train_generation(number_ok, number_ko, start):
+    '''
+    generate images for training
+    Args:
+    - number_ok (int): the number of ok images.
+    - number_ko (int): the number of ko images.
+    - start (int): the number from which we name the files.
+    '''
     gen = Datagenerator('./Data/EAF_false400', start)
     gen.create_folder()
     gen.generate_folder(number_ok, number_ko)

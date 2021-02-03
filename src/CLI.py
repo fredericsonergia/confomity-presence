@@ -4,12 +4,11 @@ from Detector.Detector import ModelBasedDetector
 from detector_utils.get_results import plot_train
 class Predictor(object):
 
-    def train_from_pretrained(self, description='Ceci est un entrainement', batch_size=20, data_path='../Data/EAF_real', save_prefix='ssd_512', start_epoch=0, epochs=10, save_plot=True):
+    def train_from_pretrained(self, batch_size=20, data_path='../Data/EAF_real', save_prefix='ssd_512', start_epoch=0, epochs=10, save_plot=True):
         '''
         command line to train from the pretrained ssd_512_mobile_net model
         
         Args:
-        - description: description de l'entraînement, si on veut indiquer le jeu de données
         - batch_size (int): the batch size for training
         - data_path (str): the root of the VOC folder containing train set
         - save_prefix (str): the prefix name used for saving output files
@@ -19,15 +18,14 @@ class Predictor(object):
         '''
         start = time.time()
         detector = ModelBasedDetector.from_pretrained(data_path=data_path, base_model='ssd_512_mobilenet1.0_custom', save_prefix=save_prefix,batch_size=batch_size)
-        epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list = detector.train(start_epoch, epoch, description)
+        epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list = detector.train(start_epoch, epochs)
         plot_train(epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list, save_prefix, save_plot)
         end = time.time()
         print("the training took " + str(end - start) + " seconds")
 
-    def train_from_finetuned(self,description='Ceci est un entrainement', batch_size=10, data_path='../Data/EAF_real', save_prefix='ssd_512', model_name='models/ssd_512_best.params', start_epoch=0, epochs=10, save_plot=True):
+    def train_from_finetuned(self, batch_size=10, data_path='../Data/EAF_real', save_prefix='ssd_512', model_name='models/ssd_512_best.params', start_epoch=0, epochs=10, save_plot=True):
         '''
         command line to train from a finetuned model
-        - description: description de l'entraînement, si on veut indiquer le jeu de données
         - batch_size (int): the batch size for training
         - batch_size (int): the batch size for training
         - data_path (str): the root of the VOC folder containing train set
@@ -39,7 +37,7 @@ class Predictor(object):
         '''
         start = time.time()
         detector = ModelBasedDetector.from_finetuned(model_name, data_path, save_prefix=save_prefix, batch_size=batch_size)
-        epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list = detector.train(start_epoch, epoch, description)
+        epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list = detector.train(start_epoch, epochs)
         plot_train(epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list, save_prefix, save_plot)
         end = time.time()
         print("the training took " + str(end - start) + " seconds")

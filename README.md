@@ -23,6 +23,7 @@ conda env export > environment.yml
 
 ## Données
 ```bash
+the/name/of/the/root/file
 └── VOC2021
   ├── Annotations
   ├── ImageSets
@@ -37,10 +38,22 @@ python app.py
 
 # CLI
 
-python CLI.py train
-python CLI.py eval
-python CLI.py predict
+```
+python CLI.py train_from_pretrained (train_from_the_ssd_mobile_net)
 
+#exemple
+python CLI.py train_from_pretrained --data_path='../Data/EAF' --save_prefix='save_name_model' --batch_size=10
+
+python CLI.py train_from_finetuned (train_from_a_saved_model)
+
+#exemple 
+python CLI.py train_from_finetuned --save_prefix='ssd_512' --data_path='../Data/EAF_real' --model_name='models/model_name_best.params' --batch_size=10 --epoch=15
+
+python CLI.py eval
+
+#
+python CLI.py predict
+```
 # Pour matthieu (entraînement et evaluate)
 ```bash
 ├── Annotations

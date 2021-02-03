@@ -3,7 +3,7 @@ from gluoncv import model_zoo
 import mxnet as mx
 from mxnet import autograd, gluon
 import gluoncv as gcv
-
+from gluoncv 
 
 class VOCLike(VOCDetection):
     CLASSES = ["cheminee", "eaf"]
@@ -30,7 +30,6 @@ def get_pretrained_model(classes):
     )
     return net
 
-
 def ssd_train_dataloader(
     net, train_dataset, data_shape=512, batch_size=10, num_workers=0
 ):
@@ -44,6 +43,7 @@ def ssd_train_dataloader(
     batchify_fn = Tuple(
         Stack(), Stack(), Stack()
     )  # stack image, cls_targets, box_targets
+    train_transform = SSDDefaultTrainTransform(width, height, anchors)
     train_loader = gluon.data.DataLoader(
         train_dataset.transform(SSDDefaultTrainTransform(width, height, anchors)),
         batch_size,
@@ -75,7 +75,12 @@ def ssd_val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0
 
 
 def validate(net, val_data, ctx, eval_metric, flip_test=False):
-    """Test on validation dataset."""
+    """
+    
+    validation on MAP
+    Args:
+    -
+    """
     eval_metric.reset()
     net.flip_test = flip_test
     mx.nd.waitall()
@@ -144,7 +149,7 @@ def get_ctx():
 
 def val_loss(net, val_data, ctx):
     """
-    Test on validation dataset.
+    validation on Loss.
     Args:
     - net (gluocv network): the network to validate
     - val_data (Dataloader, mini batch of data): the data on which we validate the model

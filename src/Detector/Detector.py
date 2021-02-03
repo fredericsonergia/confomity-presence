@@ -36,7 +36,7 @@ class BaseDetector(object):
     def eval(self, taux_fp, save_plot):
         fpr,tpr,threshholds= roc_curve(self.y_true, self.y_scores)
         arg = np.argmax(tpr[np.argwhere(fpr < taux_fp)])
-        fn = 1-fpr[arg]
+        fn = 1-tpr[arg]
         opti_thresh = threshholds[arg]
         print(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
         roc_auc = auc(fpr, tpr)
@@ -145,8 +145,7 @@ class ModelBasedDetector(BaseDetector):
             inter_bboxes = mx.nd.concat(true_bboxes,n_bboxes)
             inter_box_ids = mx.nd.concat(true_box_ids,n_box_ids)
             inter_scores = mx.nd.concat(true_scores,n_scores)
-            ax = gcv.utils.viz.plot_bbox(orig_img, inter_bboxes[0], inter_scores[0], inter_box_ids[0], class_names=detector.net.classes,thresh=thresh)
-
+            ax = gcv.utils.viz.plot_bbox(orig_img, inter_bboxes[0], inter_scores[0], inter_box_ids[0], class_names=self.net.classes,thresh=self.thresh)
         plt.show()
     def set_tests(self):
         path_test = self.data_path_test + '/VOC2021/ImageSets/Main/test.txt'
