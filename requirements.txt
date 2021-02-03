@@ -1,0 +1,16 @@
+opencv_python==4.5.1.48
+mxnet==1.7.0.post1
+tensorflow==2.4.1
+keras_ocr==0.8.6
+matplotlib==3.3.3
+numpy==1.19.5
+gluoncv==0.8.0
+fire==0.4.0
+Flask==1.1.2
+Flask_Cors==3.0.10
+tensorflow_hub==0.11.0
+flask_restplus==0.13.0
+lxml==4.6.2
+Pillow==8.1.0
+scikit_learn==0.24.1
+Trainer==0.0.1

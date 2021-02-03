@@ -11,6 +11,18 @@ import tensorflow_hub as hub
 from PIL import Image
 
 
+def crop_center(image):
+    """Returns a cropped square image."""
+    shape = image.shape
+    new_shape = min(shape[1], shape[2])
+    offset_y = max(shape[1] - shape[2], 0) // 2
+    offset_x = max(shape[2] - shape[1], 0) // 2
+    image = tf.image.crop_to_bounding_box(
+        image, offset_y, offset_x, new_shape, new_shape
+    )
+    return image
+
+
 @functools.lru_cache(maxsize=None)
 def load_image(image_url, image_size=(512, 512), preserve_aspect_ratio=True):
     """Loads and preprocesses images."""
@@ -20,6 +32,7 @@ def load_image(image_url, image_size=(512, 512), preserve_aspect_ratio=True):
         img = img / 255.0
     if len(img.shape) == 3:
         img = tf.stack([img, img, img], axis=-1)
+    img = crop_center(img)
     img = tf.image.resize(img, image_size, preserve_aspect_ratio=True)
     return img
 
@@ -93,10 +106,12 @@ def transfer_random_style_folder(
     for filename in os.listdir(content_image_folder):
         if (
             filename.endswith(".jpg")
+            or filename.endswith(".JPG")
             or filename.endswith(".png")
             or filename.endswith(".jpeg")
         ):
             style_image_url = random.choice(styles)
+            print(style_image_url)
             style_image = load_image(style_image_url, style_img_size)
             style_image = tf.nn.avg_pool(
                 style_image, ksize=[3, 3], strides=[1, 1], padding="SAME"
@@ -115,13 +130,11 @@ def transfer_random_style_folder(
 if __name__ == "__main__":
     start = time.time()
 
-    content_image_folder = "/Users/matthieu/Documents/Project3/EAF_false800/VOC2021/JPEGImagesBase"  # @param {type:"string"}
+    content_image_folder = "/Users/matthieu/Documents/Project3/presence/Data/EAF_test/VOC2021/JPEGImages"  # @param {type:"string"}
 
-    style_folder = "/Users/matthieu/Documents/Project3/presence/style_transfer/Style"
+    style_folder = "/Users/matthieu/Documents/Project3/presence/style_transfer/Style2"
     # @param {type:"string"}
-    result_folder = (
-        "/Users/matthieu/Documents/Project3/EAF_false800/VOC2021/JPEGImagesRandom"
-    )
+    result_folder = "/Users/matthieu/Documents/Project3/presence/Data/EAF_test/VOC2021/JPEGImagesSameStylePlus"
     output_image_size = 512  # @param {type:"integer"}
 
     transfer_random_style_folder(
@@ -130,6 +143,11 @@ if __name__ == "__main__":
 
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
+    # content_image_url = "/Users/matthieu/Documents/Project3/presence/Data/EAF_false/VOC2021/JPEGImagesBase/EAF_ok_6.jpg"
+    # style_image_url = "/Users/matthieu/Documents/Project3/presence/style_transfer/Style/BAR-EN-101_écart au feu conforme 3.JPG"
+    # stylized_image, content_image, style_image = transfer_style(
+    #     content_image_url, style_image_url
+    # )
     # show_n(
     #     [content_image, style_image, stylized_image],
     #     titles=["Original content image", "Style image", "Stylized image"],
