@@ -1,4 +1,4 @@
-opencv_python==4.5.1.48
+opencv-python==4.5.1.48
 mxnet==1.7.0.post1
 tensorflow==2.4.1
 keras_ocr==0.8.6
