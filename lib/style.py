@@ -15,6 +15,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-c",
         "--content_folder",
+        default=".EAF/VOC2021/JPEGImages"
         help="path to existing folder where images are to be used to be content references",
     )
     parser.add_argument(
