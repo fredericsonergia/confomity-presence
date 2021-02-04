@@ -7,3 +7,6 @@ class Ground:
 
     def draw(self):
         bpy.ops.mesh.primitive_cube_add(size=self.size, location=(0, 0, self.size / 2))
+
+    def get_object(self):
+        return bpy.data.objects["Cube"]

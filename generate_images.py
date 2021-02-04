@@ -48,6 +48,7 @@ def generate_ok_image(image_folder_path, filename, annot_path):
     s.clear()
     s.generate_scene()
     s.prepare_camera()
+    s.color_all()
     shapes = s.annotate()
     s.render(image_path)
     print("annotation")

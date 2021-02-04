@@ -15,36 +15,37 @@ def sph2cart(az, el, r):
     return [x, y, z]
 
 
+def hsv_to_rgb(h, s, v):
+    if s == 0.0:
+        v *= 255
+        return (v, v, v)
+    i = int(h * 6.0)  # XXX assume int() truncates!
+    f = (h * 6.0) - i
+    p, q, t = (
+        int(255 * (v * (1.0 - s))),
+        int(255 * (v * (1.0 - s * f))),
+        int(255 * (v * (1.0 - s * (1.0 - f)))),
+    )
+    v *= 255
+    i %= 6
+    if i == 0:
+        return (v, t, p)
+    if i == 1:
+        return (q, v, p)
+    if i == 2:
+        return (p, v, t)
+    if i == 3:
+        return (p, q, v)
+    if i == 4:
+        return (t, p, v)
+    if i == 5:
+        return (v, p, q)
+
+
 def get_area(bottom, top):
     long = abs(top[1] - bottom[1])
     short = abs(bottom[0] - top[0])
     return long * short
-
-
-def dichotomie_find_max_z(scene, camera, x, y):
-    a = 0
-    b = 5
-    debut = a
-    fin = b
-    k = 1
-    e = 0.0001
-    # calcul de la longueur de [a,b]
-    ecart = b - a
-    while ecart > e:
-        # calcul du milieu
-        m = (debut + fin) / 2
-        co = mathutils.Vector((x, y, m))
-        top = bpy_extras.object_utils.world_to_camera_view(  # pylint: disable=assignment-from-no-return
-            scene, camera, co
-        ).y
-        if top > k:
-            # la solution est inférieure à m
-            fin = m
-        else:
-            # la solution est supérieure à m
-            debut = m
-        ecart = fin - debut
-    return m
 
 
 def index_of_max_y(list):
@@ -119,7 +120,6 @@ def get_max_rec_from_bottom_and_top_points(bottom_vects, top_vects):
 def get_annot_chimney(scene, camera, box):
     box_2d = list(map(lambda vector: get_2d_coor(scene, camera, vector), box))
     bottom_vects, top_vects = split_into_top_bottom(box_2d)
-
     max_rectangle = get_max_rec_from_bottom_and_top_points(bottom_vects, top_vects)
     result = []
     for co in max_rectangle:
