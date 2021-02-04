@@ -7,18 +7,19 @@ import os
 import logging
 import time
 import sys
+import json
 from mxnet import autograd, gluon
 from gluoncv import model_zoo
 from gluoncv import utils
 from mxnet import nd
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, confusion_matrix
 try:
-    sys.path.append('../utils')
+    sys.path.append('../detector_utils')
     from trainer import (VOCLike, get_pretrained_model,
                                     ssd_train_dataloader, ssd_val_dataloader,
                                     validate, save_params, get_ctx, val_loss)
 except:
-    from utils.trainer import (VOCLike, get_pretrained_model,
+    from detector_utils.trainer import (VOCLike, get_pretrained_model,
                                     ssd_train_dataloader, ssd_val_dataloader,
                                     validate, save_params, get_ctx, val_loss)
 CLASSES = ['cheminee', 'eaf']
@@ -35,6 +36,7 @@ class BaseDetector(object):
     def eval(self, taux_fp, save_plot):
         fpr,tpr,threshholds= roc_curve(self.y_true, self.y_scores)
         arg = np.argmax(tpr[np.argwhere(fpr < taux_fp)])
+        fn = 1-tpr[arg]
         opti_thresh = threshholds[arg]
         print(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
         roc_auc = auc(fpr, tpr)
@@ -50,13 +52,32 @@ class BaseDetector(object):
             plt.ylabel('True Positive Rate')
             plt.title("Courbe ROC pour la détection de l'EAF")
             plt.legend(loc="lower right")
-            f.savefig('results/' + self.save_prefix + 'ROC_curve.png')
+            f.savefig('results_ROC/' + self.save_prefix + '_ROC_curve.png')
+        y_pred = np.asarray(self.y_scores >= opti_thresh).astype(int)
+        matrice_confusion = confusion_matrix(self.y_true, y_pred)
+        if not os.path.exists('logs/eval.json'):
+            results =  {'model':[self.save_prefix],
+                        'confusion_matrix': matrice_confusion.tolist(),
+                        'seuil_optimal':[opti_thresh]}
+            with open('logs/eval.json', 'w') as json_file:
+                json.dump(results, json_file)
+        else:
+            with open('logs/eval.json') as f:
+                data = json.load(f)
+            data['model'].append(self.save_prefix)
+            data['confusion_matrix'].append(matrice_confusion.tolist())
+            data['seuil_optimal'].append(opti_thresh)
+            with open('logs/eval.json', 'w') as json_file:
+                json.dump(data, json_file)
+            
         with open('logs/'+'eval.log', 'a') as log:
-            log.write(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
+            log.write(f"modèle: {self.save_prefix} \n seuil de confiance optimal : {opti_thresh:.3f}, \n on a un taux de faux positif de: {fpr[arg]} \n on a un taux de vrai positif de: {tpr[arg]} \n matrice de confusion: {matrice_confusion} \n on a un taux de faux négatif de: {fn} \n pour la condition taux de faux positif  < {taux_fp} \n")
         self.thresh = opti_thresh
 
 class ModelBasedDetector(BaseDetector):
-    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test2',data_path='../Data/EAF_2labels', train_dataloader=ssd_train_dataloader, val_dataloader=ssd_val_dataloader):
+    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test',data_path='../Data/EAF_real',
+                 data_path_test='../Data/EAF_real',train_dataloader=ssd_train_dataloader,
+                 val_dataloader=ssd_val_dataloader, batch_size=10):
         super().__init__()
         self.net = net
         self.train_dataloader = train_dataloader
@@ -70,44 +91,69 @@ class ModelBasedDetector(BaseDetector):
         self.save_prefix = save_prefix
         self.tests_set = None
         self.data_path = data_path
+        self.data_path_test = data_path_test
         self.mean_iou = None
         self.ctx = None
+        self.batch_size = batch_size
     
     @classmethod
-    def from_pretrained(cls, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
+    def from_pretrained(cls, data_path, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
-        return cls(net=net)
+        return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size)
 
     @classmethod
-    def from_finetuned(cls, name_model, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
+    def from_finetuned(cls, name_model, data_path_test='../Data/EAF_real', batch_size=10, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
-        return cls(net=net, thresh=thresh, save_prefix=save_prefix)
+        return cls(net=net, data_path_test=data_path_test, save_prefix=save_prefix, batch_size=batch_size, thresh=thresh)
 
     def set_dataset(self, split=2021):
-        self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'trainval')])
-        self.val_dataset = VOCLike(root=self.data_path, splits=[(split, 'test')])
-        self.train_data = self.train_dataloader(self.net, self.train_dataset)
-        self.val_data = self.val_dataloader(self.val_dataset)
-        self.loss_val_data = self.train_dataloader(self.net, self.val_dataset)
+        self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'train')])
+        self.val_dataset = VOCLike(root=self.data_path, splits=[(split, 'val')])
+        self.train_data = self.train_dataloader(self.net, self.train_dataset, batch_size=self.batch_size)
+        self.val_data = self.val_dataloader(self.val_dataset, batch_size=self.batch_size)
+        self.loss_val_data = self.train_dataloader(self.net, self.val_dataset, batch_size=self.batch_size)
 
-    def set_tests(self, path_test='../Data/EAF_2labels/VOC2021/ImageSets/Main/test.txt', 
-                  path_image='../Data/EAF_2labels/VOC2021/JPEGImages/'):
+    def set_test_dataset(self, split=2021):
+        self.test_dataset = VOCLike(root=self.data_path_test, splits=[(split, 'test')])
+
+    def plot_predict(self):
+        self.set_test_dataset()
+        transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
+        test_true = self.test_dataset.transform(transf)
+        items = self.test_dataset._items
+        img_paths = [p[0]+'/JPEGImages/'+p[1]+'.jpg' for p in items]
+        x_list_test, img_list_test = gcv.data.transforms.presets.ssd.load_test(img_paths, 512)
+
+        for i, (x, orig_img, data) in enumerate(zip(x_list_test, img_list_test, test_true)):
+            _,label,_ = data
+            true_box_ids, true_scores, true_bboxes= filter_eaf(nd.array([label[:, :4]]),nd.array([label[:, 4:5]]), nd.array(np.ones(shape=(1,2,1))))
+            box_ids, scores, bboxes = self.net(x)
+            n_box_ids, n_scores, n_bboxes = filter_eaf(bboxes,box_ids,scores)
+            inter_bboxes = mx.nd.concat(true_bboxes,n_bboxes)
+            inter_box_ids = mx.nd.concat(true_box_ids,n_box_ids)
+            inter_scores = mx.nd.concat(true_scores,n_scores)
+            ax = gcv.utils.viz.plot_bbox(orig_img, inter_bboxes[0], inter_scores[0], inter_box_ids[0], class_names=self.net.classes,thresh=self.thresh)
+        plt.show()
+    def set_tests(self):
+        path_test = self.data_path_test + '/VOC2021/ImageSets/Main/test.txt'
+        path_image = self.data_path_test + '/VOC2021/JPEGImages/'
         img_list = []
         with open(path_test, 'r') as f:
             readlines = f.read()
             img_list = readlines.split('\n')
         pather = lambda x: path_image + x +'.jpg'
         img_list = list(map(pather, img_list))
+        print(img_list)
         self.tests_set = img_list
 
     def set_labels_and_scores(self):
-        self.set_dataset()
+        self.set_test_dataset()
         transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
-        test_true = self.val_dataset.transform(transf)
-        y_true= np.zeros((len(self.val_dataset)))
-        y_scores = np.zeros((len(self.val_dataset)))
-        iou_list = np.zeros((len(self.val_dataset)))
+        test_true = self.test_dataset.transform(transf)
+        y_true= np.zeros((len(self.test_dataset)))
+        y_scores = np.zeros((len(self.test_dataset)))
+        iou_list = np.zeros((len(self.test_dataset)))
         x_list_test, _ = gcv.data.transforms.presets.ssd.load_test(self.tests_set, 512)
         for i, (x, data) in enumerate(zip(x_list_test, test_true)):
             _, label, _ = data
@@ -132,7 +178,8 @@ class ModelBasedDetector(BaseDetector):
         except:
             self.ctx = [mx.cpu()]
 
-    def train(self, start_epoch, epoch, save_interval):
+    def train(self, start_epoch, epoch):
+        print(self.batch_size)
         self.set_ctx()
         self.set_dataset()
         logging.basicConfig()
@@ -144,7 +191,7 @@ class ModelBasedDetector(BaseDetector):
             os.makedirs(log_dir)
         fh = logging.FileHandler(log_file_path)
         logger.addHandler(fh)
-        logger.info(f'save_prefix={self.save_prefix}, start_epoch={start_epoch}, epoch={epoch}, save_interval={save_interval}')
+        logger.info(f'save_prefix={self.save_prefix}, start_epoch={start_epoch}, epoch={epoch}')
         logger.info('Start training from [Epoch {}]'.format(start_epoch))
         best_map = [0]
         epochs = np.arange(int(epoch))
@@ -200,6 +247,10 @@ class ModelBasedDetector(BaseDetector):
             loss1_val, loss2_val = val_loss(self.net, self.loss_val_data, self.ctx)
             ce_loss_val.append(loss1_val)
             smooth_loss_val.append(loss2_val)
+            # if len(ce_loss_list) > 1 and epoch > 5:
+            #     if ce_loss_val[-1]>ce_loss_val[-2]:
+            #         print('Early stopping')
+            #         return
             ce_loss_list.append(np.mean(ce_list))
             logger.info('[Epoch {}] Validation, {}={:.3f}, {}={:.3f}'.format(
                 epoch, name1, loss1_val, name2, loss2_val))
@@ -208,7 +259,7 @@ class ModelBasedDetector(BaseDetector):
             map_name, mean_ap = validate(self.net, self.val_data, self.ctx, eval_metric)
             val_msg = '\n'.join(['{}={}'.format(k, v) for k, v in zip(map_name, mean_ap)])
             current_map = mean_ap[1]
-            save_params(self.net, best_map, current_map, epoch, int(save_interval), self.save_prefix)
+            save_params(self.net, best_map, current_map, epoch, self.save_prefix)
             map_list.append(current_map)
             logger.info('[Epoch {}] Validation: \n{}'.format(epoch, val_msg))
         return epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list

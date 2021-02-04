@@ -6,7 +6,7 @@ import gluoncv as gcv
 import mxnet as mx
 import numpy as np
 from gluoncv.utils.metrics.voc_detection import VOCMApMetric
-from utils.get_results import plot_train
+from detector_utils.get_results import plot_train
 from mxnet import gluon, autograd
 from Trainer.trainer_ssd import (
     load_data_VOC,

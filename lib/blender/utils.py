@@ -144,7 +144,7 @@ def get_protect_rec(box):
         if y < min_y:
             min_y = y
         mid_y_list.append(y)
-    mid_y = sorted(mid_y_list)[len(mid_y_list) // 2]
+    mid_y = sorted(mid_y_list)[(len(mid_y_list) // 2)]
     return [(min_x, min_y), (min_x, mid_y), (max_x, mid_y), (max_x, min_y)]
 
 

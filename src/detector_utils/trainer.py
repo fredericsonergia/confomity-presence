@@ -4,7 +4,6 @@ import mxnet as mx
 from mxnet import autograd, gluon
 import gluoncv as gcv
 
-
 class VOCLike(VOCDetection):
     CLASSES = ["cheminee", "eaf"]
 
@@ -30,7 +29,6 @@ def get_pretrained_model(classes):
     )
     return net
 
-
 def ssd_train_dataloader(
     net, train_dataset, data_shape=512, batch_size=10, num_workers=0
 ):
@@ -44,6 +42,7 @@ def ssd_train_dataloader(
     batchify_fn = Tuple(
         Stack(), Stack(), Stack()
     )  # stack image, cls_targets, box_targets
+    train_transform = SSDDefaultTrainTransform(width, height, anchors)
     train_loader = gluon.data.DataLoader(
         train_dataset.transform(SSDDefaultTrainTransform(width, height, anchors)),
         batch_size,
@@ -75,7 +74,12 @@ def ssd_val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0
 
 
 def validate(net, val_data, ctx, eval_metric, flip_test=False):
-    """Test on validation dataset."""
+    """
+    
+    validation on MAP
+    Args:
+    -
+    """
     eval_metric.reset()
     net.flip_test = flip_test
     mx.nd.waitall()
@@ -114,9 +118,13 @@ def validate(net, val_data, ctx, eval_metric, flip_test=False):
     return eval_metric.get()
 
 
-def save_params(net, best_map, current_map, epoch, save_interval=5, prefix="ssd_512"):
+def save_params(net, best_map, current_map, epoch, prefix="ssd_512"):
     """
     save parameters of the networks
+    Args:
+    - net (network): the network to save
+    - best_map (list): the current best map
+    - current_map (float): the current map
     """
     current_map = float(current_map)
     if current_map > best_map[0]:
@@ -124,13 +132,12 @@ def save_params(net, best_map, current_map, epoch, save_interval=5, prefix="ssd_
         net.save_parameters("models/{:s}_best.params".format(prefix))
         with open("logs/" + prefix + "_best_map.log", "a") as f:
             f.write("{:04d}:\t{:.4f}\n".format(epoch, current_map))
-    if save_interval and epoch % save_interval == 0:
-        net.save_parameters(
-            "models/{:s}_{:04d}_{:.4f}.params".format(prefix, epoch, current_map)
-        )
 
 
 def get_ctx():
+    '''
+    get the context from mxnet
+    '''
     try:
         a = mx.nd.zeros((1,), ctx=mx.gpu(0))
         ctx = [mx.gpu(0)]
@@ -140,7 +147,13 @@ def get_ctx():
 
 
 def val_loss(net, val_data, ctx):
-    """Test on validation dataset."""
+    """
+    validation on Loss.
+    Args:
+    - net (gluocv network): the network to validate
+    - val_data (Dataloader, mini batch of data): the data on which we validate the model
+    - ctx (array): gpu or cpu
+    """
     mx.nd.waitall()
     net.hybridize()
     mbox_loss_val = gcv.loss.SSDMultiBoxLoss()
@@ -163,11 +176,10 @@ def val_loss(net, val_data, ctx):
             sum_loss, cls_loss, box_loss = mbox_loss_val(
                 cls_preds, box_preds, cls_targets, box_targets
             )
-            autograd.backward(sum_loss)
         # since we have already normalized the loss, we don't want to normalize
         # by batch-size anymore
         ce_metric_val.update(0, [l * batch_size for l in cls_loss])
         smoothl1_metric_val.update(0, [l * batch_size for l in box_loss])
-        name1, loss1 = ce_metric_val.get()
-        name2, loss2 = smoothl1_metric_val.get()
-    return loss1, loss2
+    name1, val_loss1 = ce_metric_val.get()
+    name2, val_loss2 = smoothl1_metric_val.get()
+    return val_loss1, val_loss2

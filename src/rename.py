@@ -1,6 +1,6 @@
 import os 
 import argparse
-from utils.VOC_form import rename_img, add_text
+from detector_utils.VOC_form import rename_img, add_text
 
 
 parser = argparse.ArgumentParser(

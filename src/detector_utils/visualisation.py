@@ -2,11 +2,16 @@ import  xml.dom.minidom
 import cv2
 import os
 
-def create_visualisation(image_path="../Data/EAF/VOC2021/JPEGImages/",
+def create_visualisation(visualisation_path= "../Data/visualisation/", image_path="../Data/EAF/VOC2021/JPEGImages/",
                          annotation_path="../Data/EAF/VOC2021/Annotations/"):
+    '''
+    create from image path and annotation path the images with annotation
+    Args:
+    - visuationsation_path (str): the path where the visualisation images would be saved
+    - image_path (str): the path of the images
+    - annotation_path (str): the path of annotation files
+    '''
     colors = {'cheminee':(246,151,1), 'no_eaf': (61,38,215), 'eaf': (145,184,101)}
-    image_path="/content/drive/MyDrive/sonergia/EAF/VOC2021/JPEGImages/"
-    annotation_path="/content/drive/MyDrive/sonergia/EAF/VOC2021/Annotations/"
     files_name = os.listdir(image_path)
     for filename_ in files_name:
         filename, extension= os.path.splitext(filename_)
@@ -37,7 +42,7 @@ def create_visualisation(image_path="../Data/EAF/VOC2021/JPEGImages/",
             cv2.putText(img, label,(int(xmax_data), int(ymin_data)), cv2.FONT_HERSHEY_SIMPLEX, int(fontScale),color, thickness)
             cv2.rectangle(img,(int(xmin_data),int(ymin_data)),(int(xmax_data),int(ymax_data)),color,5)
         flag=0
-        flag=cv2.imwrite("../Data/visualisation/{}.jpg".format(filename),img)
+        flag=cv2.imwrite(visualisation_path + "{}.jpg".format(filename),img)
         if flag:
             print(filename,"done")
     print("all done ====================================")
