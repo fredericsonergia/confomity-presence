@@ -190,7 +190,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-r",
         "--rootfolder",
-        default=".",
+        default="EAF",
         help="root folder where the VOC2021 folder will be / is, default is .",
     )
     parser.add_argument(
