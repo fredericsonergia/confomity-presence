@@ -19,40 +19,55 @@ conda activate presence
 
 conda env export > environment.yml
 
-# Entrainement
+# API
 
-## Données
+python app.py
+# Entrainement
+## Avant l'entraînement
+### L'Annotation
+
+### Format des données
+
+Les données doivent être sous le format suivant (voir VOCLilke)
+
+Dans Annotations se trouvent les fichiers *.xml* d'annotations
+Dans JPEGImages se trouvent les images d'extension *.jpg*
+Dans ImageSets/Main se trouvent le découpage en train, validation, test set
+
 ```bash
 the/name/of/the/root/file
 └── VOC2021
   ├── Annotations
   ├── ImageSets
   │ └── Main
-  │ ├── test.txt
-  │ └── trainval.txt
+  │ ├── train.txt
+  │ └── val.txt
+  │ └── test.txt
   └── JPEGImages
 ```
-# API
 
-python app.py
-
-# CLI
+## CLI pour l'entraînement (voir **CLI_detector.py**)
 
 ```
-python CLI.py train_from_pretrained (train_from_the_ssd_mobile_net)
+python CLI_detector.py train_from_pretrained (entrainement à partir du modèle pré-entraîné)
 
 #exemple
-python CLI.py train_from_pretrained --data_path='../Data/EAF' --save_prefix='save_name_model' --batch_size=10
+python CLI_detector.py train_from_pretrained --data_path='../Data/EAF' --save_prefix='save_name_model' --batch_size=10
 
-python CLI.py train_from_finetuned (train_from_a_saved_model)
+python CLI_detector.py train_from_finetuned (entraînement à partir d'un modèle sauvegardé en local)
 
 #exemple 
-python CLI.py train_from_finetuned --save_prefix='ssd_512' --data_path='../Data/EAF_real' --model_name='models/model_name_best.params' --batch_size=10 --epoch=15
+python CLI_detector.py train_from_finetuned --save_prefix='ssd_512' --data_path='../Data/EAF_real' --model_name='models/model_name_best.params' --batch_size=10 --epoch=15
 
-python CLI.py eval
+python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux positif en affichant la matrice de  confusion dans la console et en le sauvegardant dans un fichier log dans *logs* et en sauvegardant la courbe ROC curve dans *results_ROC*)
 
-#
-python CLI.py predict
+#exemple
+!python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_name='models/path/to/model' --taux_fp=0.143
+
+python CLI_detector.py predict (faire une prédiction sur une image)
+
+#exemple
+python CLI_detector.py predict model_name='models/ssd_512_best.params' input_path='inputs/EAF3.jpg' output_folder='outputs/' thresh=0.3 data_path_test='../Data/EAF_real'
 ```
 # Pour matthieu (entraînement et evaluate)
 ```bash
