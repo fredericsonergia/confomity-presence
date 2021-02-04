@@ -130,11 +130,15 @@ def transfer_random_style_folder(
 if __name__ == "__main__":
     start = time.time()
 
-    content_image_folder = "/Users/matthieu/Documents/Project3/presence/Data/EAF_test/VOC2021/JPEGImages"  # @param {type:"string"}
+    content_image_folder = "/Users/matthieu/Documents/Project3/presence/Data/EAF_false/VOC2021/JPEGImagesBase"  # @param {type:"string"}
 
-    style_folder = "/Users/matthieu/Documents/Project3/presence/style_transfer/Style2"
+    style_folder = (
+        "/Users/matthieu/Documents/Project3/presence/lib/style_transfer/Style2"
+    )
     # @param {type:"string"}
-    result_folder = "/Users/matthieu/Documents/Project3/presence/Data/EAF_test/VOC2021/JPEGImagesSameStylePlus"
+    result_folder = (
+        "/Users/matthieu/Documents/Project3/presence/Data/EAF_false/VOC2021/style21"
+    )
     output_image_size = 512  # @param {type:"integer"}
 
     transfer_random_style_folder(
