@@ -147,13 +147,4 @@ if __name__ == "__main__":
 
     end = time.time()
     print("the generation took " + str(end - start) + " seconds")
-    # content_image_url = "/Users/matthieu/Documents/Project3/presence/Data/EAF_false/VOC2021/JPEGImagesBase/EAF_ok_6.jpg"
-    # style_image_url = "/Users/matthieu/Documents/Project3/presence/style_transfer/Style/BAR-EN-101_écart au feu conforme 3.JPG"
-    # stylized_image, content_image, style_image = transfer_style(
-    #     content_image_url, style_image_url
-    # )
-    # show_n(
-    #     [content_image, style_image, stylized_image],
-    #     titles=["Original content image", "Style image", "Stylized image"],
-    # )
 
