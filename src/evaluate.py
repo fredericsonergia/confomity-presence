@@ -1,7 +1,7 @@
 import argparse
 import os
 import logging
-from utils import get_results
+from detector_utils import get_results
 import gluoncv as gcv
 from Trainer.trainer_ssd import load_data_VOC
 
