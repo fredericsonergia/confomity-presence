@@ -58,7 +58,7 @@ class Predictor(object):
         detector.set_labels_and_scores()
         detector.eval(taux_fp, save_plot)
 
-    def predict(self, model_name='models/ssd_512_best.params', input_path='inputs/EAF3.jpg', output_folder='outputs/', thresh=0.3):
+    def predict(self, model_name='models/ssd_512_best.params', input_path='inputs/EAF3.jpg', output_folder='outputs/', thresh=0.3, data_path_test='../Data/EAF_real'):
         '''
         command line to predict with an input image and save the result 
         

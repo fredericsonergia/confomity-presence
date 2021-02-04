@@ -3,7 +3,6 @@ from gluoncv import model_zoo
 import mxnet as mx
 from mxnet import autograd, gluon
 import gluoncv as gcv
-from gluoncv 
 
 class VOCLike(VOCDetection):
     CLASSES = ["cheminee", "eaf"]

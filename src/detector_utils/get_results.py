@@ -11,57 +11,6 @@ from sklearn.metrics import roc_curve, auc
 CLASSES = ["cheminee", "eaf"]
 
 
-def filter_eaf(bboxes, box_ids, scores):
-    new_bboxes, new_box_ids, new_scores = (
-        nd.array(np.zeros(shape=(1, 1, 4))),
-        nd.array(np.zeros(shape=(1, 1, 1))),
-        nd.array(np.zeros(shape=(1, 1, 1))),
-    )
-    found = False
-    for index, (box, ids, score) in enumerate(zip(bboxes[0], box_ids[0], scores[0])):
-        if not found:
-            if ids[0] == float(1):
-                new_bboxes[0][0] = box
-                new_box_ids[0][0] = ids
-                new_scores[0][0] = score
-                found = True
-    return new_box_ids, new_scores, new_bboxes
-
-
-def load_model(name_model):
-    net = gcv.model_zoo.get_model(
-        "ssd_512_mobilenet1.0_custom", classes=CLASSES, pretrained_base=False
-    )
-    net.load_parameters(name_model)
-    return net
-
-
-def get_ouput_model(image_path, name_model, thresh, name_output, close=False):
-    x, img = gcv.data.transforms.presets.ssd.load_test(image_path, 512)
-    net = load_model(name_model)
-    box_ids, scores, bboxes = net(x)
-    n_box_ids, n_scores, n_bboxes = filter_eaf(bboxes, box_ids, scores)
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax = utils.viz.plot_bbox(
-        img,
-        n_bboxes[0],
-        n_scores[0],
-        n_box_ids[0],
-        class_names=net.classes,
-        ax=ax,
-        thresh=thresh,
-    )
-    plt.axis("off")
-    fig.savefig("outputs/" + name_output + ".png")
-    if close:
-        plt.close(fig)
-    else:
-        plt.show()
-
-    return n_scores.asnumpy()[0][0][0], "outputs/" + name_output + ".png"
-
-
 def process_output_img(name_path):
     path, filename = os.path.split(name_path)
     img = cv2.imread(name_path)  # Read in the image and convert to grayscale
@@ -76,12 +25,6 @@ def process_output_img(name_path):
     cv2.imwrite(output_image_path, rect)
     os.remove(name_path)
     return output_image_path
-
-
-def get_prediction(score, thresh):
-    if score >= thresh:
-        return "Nous avons détecté un écart au feu "
-    return "Nous n'avons pas détecté d'écart au feu"
 
 
 def ROC_curve_thresh(y_true, y_scores, taux_fp, save_plot):
@@ -160,6 +103,9 @@ def plot_train(
     save_prefix,
     save_plot=True,
 ):
+    '''
+    plot the outputs from training
+    '''
     f = plt.figure(figsize=(5, 10))
     ax = f.add_subplot(311)
 

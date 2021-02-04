@@ -57,13 +57,7 @@ class BaseDetector(object):
         matrice_confusion = confusion_matrix(self.y_true, y_pred)
         if not os.path.exists('logs/eval.json'):
             results =  {'model':[self.save_prefix],
-                        'description': [self.description_train],
-                        'taux_faux_positif': [fpr],
-                        'taux_vrai_positif':[tpr],
-                        'taux_faux_positif_fixe': [taux_fp],
-                        'taux_faux_negatif':[fn],
-                        'taux_vrai_p': [tpr[arg]],
-                        'confusion_matrix': matrice_confusion,
+                        'confusion_matrix': matrice_confusion.tolist(),
                         'seuil_optimal':[opti_thresh]}
             with open('logs/eval.json', 'w') as json_file:
                 json.dump(results, json_file)
@@ -71,18 +65,13 @@ class BaseDetector(object):
             with open('logs/eval.json') as f:
                 data = json.load(f)
             data['model'].append(self.save_prefix)
-            data['description'].append(self.description_train)
-            data['taux_faux_positif'].append(fpr)
-            data['taux_vrai_positif'].append(tpr)
-            data['taux_faux_positif_fixe'].append(taux_fp)
-            data['taux_faux_negatif'].append(fn)
-            data['taux_vrai_p'].append([tpr[arg]])
+            data['confusion_matrix'].append(matrice_confusion.tolist())
             data['seuil_optimal'].append(opti_thresh)
-            with open('eval.json', 'w') as json_file:
+            with open('logs/eval.json', 'w') as json_file:
                 json.dump(data, json_file)
             
         with open('logs/'+'eval.log', 'a') as log:
-            log.write(f"modèle: {self.save_prefix} \n description de l'entrainement: {self.description_train} \n seuil de confiance optimal : {opti_thresh:.3f}, \n on a un taux de faux positif de: {fpr[arg]} \n on a un taux de vrai positif de: {tpr[arg]} \n matrice de confusion: {matrice_confusion} \n on a un taux de faux négatif de: {fn} \n pour la condition taux de faux positif  < {taux_fp} \n")
+            log.write(f"modèle: {self.save_prefix} \n seuil de confiance optimal : {opti_thresh:.3f}, \n on a un taux de faux positif de: {fpr[arg]} \n on a un taux de vrai positif de: {tpr[arg]} \n matrice de confusion: {matrice_confusion} \n on a un taux de faux négatif de: {fn} \n pour la condition taux de faux positif  < {taux_fp} \n")
         self.thresh = opti_thresh
 
 class ModelBasedDetector(BaseDetector):
@@ -106,7 +95,6 @@ class ModelBasedDetector(BaseDetector):
         self.mean_iou = None
         self.ctx = None
         self.batch_size = batch_size
-        self.description_train = None
     
     @classmethod
     def from_pretrained(cls, data_path, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
@@ -114,7 +102,7 @@ class ModelBasedDetector(BaseDetector):
         return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size)
 
     @classmethod
-    def from_finetuned(cls, name_model, data_path_test, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
+    def from_finetuned(cls, name_model, data_path_test='../Data/EAF_real', batch_size=10, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
         return cls(net=net, data_path_test=data_path_test, save_prefix=save_prefix, batch_size=batch_size, thresh=thresh)
@@ -190,8 +178,7 @@ class ModelBasedDetector(BaseDetector):
         except:
             self.ctx = [mx.cpu()]
 
-    def train(self, start_epoch, epoch, description):
-        self.description_train=description
+    def train(self, start_epoch, epoch):
         print(self.batch_size)
         self.set_ctx()
         self.set_dataset()
