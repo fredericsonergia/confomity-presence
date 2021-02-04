@@ -133,11 +133,11 @@ if __name__ == "__main__":
     content_image_folder = "/Users/matthieu/Documents/Project3/presence/Data/EAF_false/VOC2021/JPEGImagesBase"  # @param {type:"string"}
 
     style_folder = (
-        "/Users/matthieu/Documents/Project3/presence/lib/style_transfer/Style2"
+        "/Users/matthieu/Documents/Project3/presence/lib/style_transfer/Style"
     )
     # @param {type:"string"}
     result_folder = (
-        "/Users/matthieu/Documents/Project3/presence/Data/EAF_false/VOC2021/style21"
+        "/Users/matthieu/Documents/Project3/presence/Data/EAF_false/VOC2021/style72"
     )
     output_image_size = 512  # @param {type:"integer"}
 
