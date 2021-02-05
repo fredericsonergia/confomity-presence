@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from PIL import Image
 import io
 from base64 import encodebytes
@@ -14,7 +15,7 @@ def my_arg_max(my_list):
     if my_list[i] > current :
       index = i
       current = my_list[i]
-  return index,current
+  return index, current
 
 def find_intersection(slope1,ordinate1,slope2,ordinate2):
   """
@@ -75,5 +76,18 @@ def get_response_image(image_path):
     pil_img.save(byte_arr, format="PNG")  # convert the PIL image to byte array
     encoded_img = encodebytes(byte_arr.getvalue()).decode("ascii")  # encode as base64
     return encoded_img
+
+def angle_betw_2_vects(vect1:tuple, vect2:tuple)->float:
+  """
+    @parameters: two tuples of size 2 each. They represents plane vectors
+    @returns: a float representing the inner angle of the two vectors. in radians
+  """
+  vect1_normalized = (vect1[0]/math.sqrt(vect1[0]*vect1[0]+vect1[1]*vect1[1]),vect1[1]/math.sqrt(vect1[0]*vect1[0]+vect1[1]*vect1[1]))
+  vect2_normalized = (vect2[0]/math.sqrt(vect2[0]*vect2[0]+vect2[1]*vect2[1]),vect2[1]/math.sqrt(vect2[0]*vect2[0]+vect2[1]*vect2[1]))
+  print("normalized vector",vect1_normalized)
+  print("normalized vector",vect2_normalized)
+  scalar_product = vect1_normalized[0]*vect2_normalized[0]+vect1_normalized[1]*vect2_normalized[1]
+  return math.acos(scalar_product)
+
 
     
