@@ -79,7 +79,7 @@ class requestForm:
 
 
 class presenceResponse(BaseModel):
-    score: int
+    score: float
     image: str
     prediction: bool
 
@@ -138,15 +138,12 @@ def conformity(request: requestForm = Depends()):
         result = conformity.get_conformity()
         output_image_path = os.path.join(settings.OUTPUT_FOLDER, filename)
         if result["type"] == "valid":
+            conformity.get_illustration(output_image_path)
             encoded_img = get_response_image(output_image_path)
             result["image"] = encoded_img
         return result
     else:
-        return (
-            jsonify(
-                {
-                    "msg": f"Les extensions autorisées sont {', '.join(ALLOWED_EXTENSIONS)}."
-                }
-            ),
-            400,
-        )
+        return {
+            "type": "error",
+            "message": f"Les extensions autorisées sont {', '.join(ALLOWED_EXTENSIONS)}.",
+        }
