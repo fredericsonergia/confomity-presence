@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 class Image:
     def __init__(self, imagePath):
-        self.resolution = (640,640)
+        self.resolution = (500,500)
         self.basic = cv2.imread(imagePath)
         self.resized = cv2.resize(self.basic, self.resolution, interpolation = cv2.INTER_AREA)
         self.original = cv2.cvtColor(self.resized, cv2.COLOR_BGR2RGB)
@@ -16,7 +16,7 @@ class Image:
     #Defining functions that gives edges
     def edges_detection(self):
         gray = self.gray_scale()
-        edges = cv2.Canny(gray,100,300,apertureSize = 3)
+        edges = cv2.Canny(gray,100,200,apertureSize = 3)
         return edges
 
     #Defining function that returns dilated binary image from edges
@@ -39,6 +39,6 @@ class Image:
         return self.original
 
 if __name__ == '__main__':
-    print("okay, brother")
+    #print("okay, brother")
     my_image = Image("im1-rotate.png")
-    print(my_image.original.shape)
+    #print(my_image.original.shape)
