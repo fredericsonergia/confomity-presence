@@ -19,9 +19,7 @@ conda activate presence
 
 conda env export > environment.yml
 
-# API
 
-python app.py
 # Entrainement
 ## Avant l'entraînement
 ### Format des données
@@ -45,7 +43,9 @@ the/name/of/the/root/file
 ```
 Pour compléter le jeu de données réel, il faut suivre les étapes suivantes:
 
-### Renommage des images (**CLI_data.py**)
+### Renommage des images
+
+Pour plus d'informations sur les arguments des CLI, voir **CLI_data.py**
 
 Vous pouvez renommer les images KO ou OK (en EAF_OK_chiffre.jpg ou EAF_KO_chiffre.jpg) d'un dossier avec la CLI suivante:
 
@@ -66,7 +66,9 @@ Les fichiers d'annotation sont à placer dans *VOC2021/Annotations*
 
 Ensuite il faut ajouter les noms (sans l'extension) aux fichiers Main/*.txt* soit dans le train.txt (pour compléter les données d'entraînement), soit dans le val.txt (pour compléter les données de validation), soit le test.txt (pour compléter les données de test)
 
-## CLI pour l'entraînement (voir **CLI_detector.py**)
+## CLI pour l'entraînement
+
+Pour plus d'informations sur les arguments des CLI, voir **CLI_detector.py**
 
 ```
 python CLI_detector.py train_from_pretrained (entrainement à partir du modèle pré-entraîné)
