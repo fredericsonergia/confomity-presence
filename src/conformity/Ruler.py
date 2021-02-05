@@ -23,54 +23,55 @@ class Ruler:
             pipeline = pipeline = keras_ocr.pipeline.Pipeline()
             prediction_groups = pipeline.recognize(images)
             to_return =[]
-            #print('digits_before_process', prediction_groups[0])
-            for my_tuple in prediction_groups[0]:
-                try:
-                    int(my_tuple[0])
-                    to_return.append(my_tuple)
-                except:
-                    continue
-            accepted_distance = double_of_box_width(to_return[0])/2
-            first_point = approximate_text_by_point(to_return[0])
-            second_point = approximate_text_by_point(to_return[1])
-            slope,ordinate = slope_ordinate(first_point,second_point)
-            to_return = []
-            for my_tuple in prediction_groups[0]:
-                try:
-                    int(my_tuple[0])
-                    to_return.append(my_tuple)
-                except:
-                    box_point = approximate_text_by_point(my_tuple)
-                    distance_to_axis = distance_to_line(slope,ordinate,box_point)
-                    if distance_to_axis < accepted_distance:
-                        if my_tuple[0] in ['o', 'O']:
-                            to_return.append((str(0),my_tuple[1]))
-                        #elif my_tuple[0] in ['s','S']:
-                            #to_return.append((str(5),my_tuple[1]))
-                        else:
-                            if len(my_tuple[0])==2:
-                                try:
-                                    int(my_tuple[0][0])
-                                    unit = my_tuple[0][1]
-                                    if unit in ['o', 'O']:
-                                        to_return.append((my_tuple[0][0]+'0',my_tuple[1]))
-                                    elif unit in ['s','S']:
-                                        to_return.append((my_tuple[0][0]+'5',my_tuple[1]))
-                                    else:
-                                        continue
-                                except:
-                                    if my_tuple[0][0]=='l':
+            #print('digits_brut', prediction_groups)
+            if len(prediction_groups[0]) >0:
+                for my_tuple in prediction_groups[0]:
+                    try:
+                        int(my_tuple[0])
+                        to_return.append(my_tuple)
+                    except:
+                        continue
+                accepted_distance = double_of_box_width(to_return[0])/2
+                first_point = approximate_text_by_point(to_return[0])
+                second_point = approximate_text_by_point(to_return[1])
+                slope,ordinate = slope_ordinate(first_point,second_point)
+                to_return = []
+                for my_tuple in prediction_groups[0]:
+                    try:
+                        int(my_tuple[0])
+                        to_return.append(my_tuple)
+                    except:
+                        box_point = approximate_text_by_point(my_tuple)
+                        distance_to_axis = distance_to_line(slope,ordinate,box_point)
+                        if distance_to_axis < accepted_distance:
+                            if my_tuple[0] in ['o', 'O']:
+                                to_return.append((str(0),my_tuple[1]))
+                            #elif my_tuple[0] in ['s','S']:
+                                #to_return.append((str(5),my_tuple[1]))
+                            else:
+                                if len(my_tuple[0])==2:
+                                    try:
+                                        int(my_tuple[0][0])
                                         unit = my_tuple[0][1]
                                         if unit in ['o', 'O']:
-                                            to_return.append(('10',my_tuple[1]))
+                                            to_return.append((my_tuple[0][0]+'0',my_tuple[1]))
                                         elif unit in ['s','S']:
-                                            to_return.append(('15',my_tuple[1]))
-                                    else:
-                                        continue
-                            else:
-                                continue
-                    else:
-                        continue
+                                            to_return.append((my_tuple[0][0]+'5',my_tuple[1]))
+                                        else:
+                                            continue
+                                    except:
+                                        if my_tuple[0][0]=='l':
+                                            unit = my_tuple[0][1]
+                                            if unit in ['o', 'O']:
+                                                to_return.append(('10',my_tuple[1]))
+                                            elif unit in ['s','S']:
+                                                to_return.append(('15',my_tuple[1]))
+                                        else:
+                                            continue
+                                else:
+                                    continue
+                        else:
+                            continue
             self.digits = to_return
         return self.digits
 

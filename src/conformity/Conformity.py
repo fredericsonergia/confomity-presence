@@ -126,7 +126,7 @@ class Conformity:
             if not self.__protection.check_protection():
                 self.__conformity = {"type":"error", "message":"Nous n'arrivons pas à bien détecter la protection présente sur l'image."}
             elif not self.__ruler.check_digits_readability():
-                self.__conformity = {"type":"error", "massage":"Nous n'arrivons pas à lire les chiffres sur la réglette."}
+                self.__conformity = {"type":"error", "massage":"Nous n'arrivons pas à détecter de réglette ou lire les chiffres sur la réglette."}
             elif not self.__ruler.check_inclinaison_conformity(15/100):
                 self.__conformity = {"type":"error", "message":"Votre réglettre ne semble pas parallèle au sol ou à l'appareil photo."}
             elif not self.check_orthogonality():
@@ -236,9 +236,9 @@ class Conformity:
         self.__protection_axis_color = color
 
 
-#if __name__ == '__main__':
-    #print("okay, brother")
-    #my_conformity = Conformity("im1-rotate.png")
+if __name__ == '__main__':
+    print("okay, brother")
+    my_conformity = Conformity("img3.jpeg")
 #    print("intersection",my_conformity.get_intersection())
 #    print("max digit read",my_conformity.get_max_digit_read())
 #    print("work sclae", my_conformity.get_ruler().get_pixel_centimeter_scale())
