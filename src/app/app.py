@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Form, Depends
 from pydantic import BaseModel, BaseSettings
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
 
 import shutil
 import io
@@ -84,8 +85,10 @@ class presenceResponse(BaseModel):
 
 
 class conformityResponse(BaseModel):
-    image: str
-    prediction: str
+    type: str
+    image: Optional[str]
+    distance: Optional[float]
+    msg: Optional[str]
 
 
 """
@@ -132,11 +135,12 @@ def conformity(request: requestForm = Depends()):
         with open(os.path.join(settings.UPLOAD_FOLDER, filename), "wb") as buffer:
             shutil.copyfileobj(uploaded_file.file, buffer)
         conformity = Conformity(os.path.join(settings.UPLOAD_FOLDER, filename))
+        result = conformity.get_conformity()
         output_image_path = os.path.join(settings.OUTPUT_FOLDER, filename)
-        conformity.get_illustration(output_image_path)
-        encoded_img = get_response_image(output_image_path)
-        prediction = conformity.get_distance()
-        return {"image": encoded_img, "prediction": prediction}
+        if result["type"] == "valid":
+            encoded_img = get_response_image(output_image_path)
+            result["image"] = encoded_img
+        return result
     else:
         return (
             jsonify(
