@@ -88,7 +88,7 @@ class conformityResponse(BaseModel):
     type: str
     image: Optional[str]
     distance: Optional[float]
-    msg: Optional[str]
+    message: Optional[str]
 
 
 """
