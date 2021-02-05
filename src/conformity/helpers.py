@@ -84,8 +84,8 @@ def angle_betw_2_vects(vect1:tuple, vect2:tuple)->float:
   """
   vect1_normalized = (vect1[0]/math.sqrt(vect1[0]*vect1[0]+vect1[1]*vect1[1]),vect1[1]/math.sqrt(vect1[0]*vect1[0]+vect1[1]*vect1[1]))
   vect2_normalized = (vect2[0]/math.sqrt(vect2[0]*vect2[0]+vect2[1]*vect2[1]),vect2[1]/math.sqrt(vect2[0]*vect2[0]+vect2[1]*vect2[1]))
-  print("normalized vector",vect1_normalized)
-  print("normalized vector",vect2_normalized)
+  #print("normalized vector",vect1_normalized)
+  #print("normalized vector",vect2_normalized)
   scalar_product = vect1_normalized[0]*vect2_normalized[0]+vect1_normalized[1]*vect2_normalized[1]
   return math.acos(scalar_product)
 
