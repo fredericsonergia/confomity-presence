@@ -80,7 +80,7 @@ class requestForm:
 class presenceResponse(BaseModel):
     score: int
     image: str
-    prediction: str
+    prediction: bool
 
 
 class conformityResponse(BaseModel):
@@ -119,7 +119,7 @@ def presence(request: requestForm = Depends()):
             400,
         )
     encoded_img = get_response_image(output_image_path)
-    return {"score": score, "image": encoded_img, "prediction": str(prediction)}
+    return {"score": score, "image": encoded_img, "prediction": prediction}
 
 
 @app.post("/predict_conformity", response_model=conformityResponse)
