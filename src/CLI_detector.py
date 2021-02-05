@@ -44,7 +44,7 @@ class Predictor(object):
 
     def eval(self, data_path_test='../Data/EAF_real', save_prefix='ssd_512_test2', model_name='models/ssd_512_best.params', taux_fp=0.05, save_plot=True):
         '''
-        command line to evaluate the model on a test datase
+        command line to evaluate the model on a test dataset
         Args:
         - data_path_test (str): the root of the VOC folder containing the test set
         - save_prefix (str): the prefix name used for saving output files

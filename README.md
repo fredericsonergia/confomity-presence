@@ -24,8 +24,6 @@ conda env export > environment.yml
 python app.py
 # Entrainement
 ## Avant l'entraînement
-### L'Annotation
-
 ### Format des données
 
 Les données doivent être sous le format suivant (voir VOCLilke)
@@ -45,6 +43,28 @@ the/name/of/the/root/file
   │ └── test.txt
   └── JPEGImages
 ```
+Pour compléter le jeu de données réel, il faut suivre les étapes suivantes:
+
+### Renommage des images (**CLI_data.py**)
+
+Vous pouvez renommer les images KO ou OK (en EAF_OK_chiffre.jpg ou EAF_KO_chiffre.jpg) d'un dossier avec la CLI suivante:
+
+python CLI_data.py rename 
+
+#exemple 
+
+python CLI_data.py rename --path='path/du/dossier/images' start=0 is_ok=True
+
+Après avoir renommer les images, il faut placer les images dans *VOC2021/JPEGImages*.
+
+### L'Annotation
+
+L'annotation peut se faire avec le module open-source labelImg (https://github.com/tzutalin/labelImg) en sauvegardant les annotations sous xml (PASCAL VOC format).
+Les fichiers d'annotation sont à placer dans *VOC2021/Annotations*
+
+### Modifier les fichiers de découpage
+
+Ensuite il faut ajouter les noms (sans l'extension) aux fichiers Main/*.txt* soit dans le train.txt (pour compléter les données d'entraînement), soit dans le val.txt (pour compléter les données de validation), soit le test.txt (pour compléter les données de test)
 
 ## CLI pour l'entraînement (voir **CLI_detector.py**)
 
