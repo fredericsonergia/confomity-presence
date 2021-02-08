@@ -3,7 +3,10 @@ from gluoncv import model_zoo
 import mxnet as mx
 from mxnet import autograd, gluon
 import gluoncv as gcv
-
+import numpy as np
+from gluoncv.data.transforms import image as timage
+from gluoncv.data.transforms import bbox as tbbox
+from gluoncv.data.transforms import experimental
 class VOCLike(VOCDetection):
     CLASSES = ["cheminee", "eaf"]
 
@@ -29,6 +32,42 @@ def get_pretrained_model(classes):
     )
     return net
 
+def new_trainloader_call(self, src, label):
+    # random color jittering
+    img = experimental.image.random_color_distort(src)
+
+    # random expansion with prob 0.5
+    if np.random.uniform(0, 1) > 0.5:
+        img, expand = timage.random_expand(img, fill=[m * 255 for m in self._mean])
+        bbox = tbbox.translate(label, x_offset=expand[0], y_offset=expand[1])
+    else:
+        img, bbox = img, label
+
+    # random cropping
+    h, w, _ = img.shape
+    bbox, crop = experimental.bbox.random_crop_with_constraints(bbox, (w, h))
+    x0, y0, w, h = crop
+    img = mx.image.fixed_crop(img, x0, y0, w, h)
+
+    # resize with random interpolation
+    h, w, _ = img.shape
+    interp = np.random.randint(0, 5)
+    img = timage.imresize(img, self._width, self._height, interp=interp)
+    bbox = tbbox.resize(bbox, (w, h), (self._width, self._height))
+
+    # to tensor
+    img = mx.nd.image.to_tensor(img)
+    img = mx.nd.image.normalize(img, mean=self._mean, std=self._std)
+    if self._anchors is None:
+        return img, bbox.astype(img.dtype)
+
+    # generate training target so cpu workers can help reduce the workload on gpu
+    gt_bboxes = mx.nd.array(bbox[np.newaxis, :, :4])
+    gt_ids = mx.nd.array(bbox[np.newaxis, :, 4:5])
+    cls_targets, box_targets, _ = self._target_generator(
+        self._anchors, None, gt_bboxes, gt_ids)
+    return img, cls_targets[0], box_targets[0]
+
 def ssd_train_dataloader(
     net, train_dataset, data_shape=512, batch_size=10, num_workers=0
 ):
@@ -42,9 +81,10 @@ def ssd_train_dataloader(
     batchify_fn = Tuple(
         Stack(), Stack(), Stack()
     )  # stack image, cls_targets, box_targets
-    train_transform = SSDDefaultTrainTransform(width, height, anchors)
+    new_SSDDefaultTrainTransform=SSDDefaultTrainTransform(width, height, anchors)
+    new_SSDDefaultTrainTransform.__call__= new_trainloader_call
     train_loader = gluon.data.DataLoader(
-        train_dataset.transform(SSDDefaultTrainTransform(width, height, anchors)),
+        train_dataset.transform(new_SSDDefaultTrainTransform),
         batch_size,
         True,
         batchify_fn=batchify_fn,
