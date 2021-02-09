@@ -149,12 +149,12 @@ python CLI_detector.py train_from_finetuned --save_prefix='ssd_512' --data_path=
 ```
 
 En sortie:
-Sauvegarde les courbes d'entraînement dans le dossier indiqué en paramètre
+Sauvegarde les courbes et les logs d'entraînement dans les dossiers indiqués en paramètre
 
 ## Comment évaluer un modèle ?
 
 ```
-python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux positif en affichant la matrice de  confusion dans la console et en le sauvegardant dans un fichier log dans *logs* et en sauvegardant la courbe ROC curve dans *results_ROC*)
+python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux positif)
 
 
 #exemple
@@ -163,7 +163,7 @@ python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='f
 ```
 
 En sortie:
-WIP
+Sauvegarde les logs (matrice de confusion) et résultat d'évaluation (ROC_curves) dans les dossiers indiqués en paramètre.
 ## Comment faire une prédiction sur une image ?
 
 
@@ -176,4 +176,4 @@ python CLI_detector.py predict model_name='models/ssd_512_best.params' input_pat
 ```
 
 En sortie:
-WIP
+Sauvegarde l'image de la prédiction dans le dossier outpute renseigné en paramètre
