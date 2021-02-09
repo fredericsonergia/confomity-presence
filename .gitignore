@@ -19,7 +19,8 @@ logs
 uploads
 gluon-cv
 Tests
-models
+src/app/models
+**.params
 Style
 Style2
 Results

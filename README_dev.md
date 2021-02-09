@@ -159,14 +159,14 @@ python CLI_detector.py predict model_name='models/ssd_512_best.params' input_pat
 └── src
     ├── Detector
     ├── app
-    │   ├── models (dossier où se trouve le modèle)
+    │   ├── models (dossier où se trouve le modèle utilisé par lapp)
     │   ├── outputs (sortie du modèle)
     │   ├── tests
     │   └── uploads (entrée du modèle)
     ├── detector_utils
     ├── inputs
     ├── logs (les logs notamment ceux concernant lévaluation)
-    ├── models
+    ├── models (modèles en sortie des entraînements)
     ├── outputs
     ├── results_ROC (endroit où sont sauvegardés les courbes ROC)
     ├── results_train (endroit où sont sauvegardés les courbes dentraînement)
