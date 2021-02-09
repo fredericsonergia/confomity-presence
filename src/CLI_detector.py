@@ -4,7 +4,7 @@ from Detector.Detector import ModelBasedDetector
 from detector_utils.get_results import plot_train
 class Predictor(object):
 
-    def train_from_pretrained(self, batch_size=20, data_path='../Data/EAF_real', save_prefix='ssd_512',
+    def train_from_pretrained(self, batch_size=10, data_path='../Data/EAF_real', save_prefix='ssd_512',
                               start_epoch=0, epochs=10, save_plot=True, train_result_folder='results_train/',
                               log_folder='logs/'):
         '''

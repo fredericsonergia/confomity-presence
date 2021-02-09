@@ -10,7 +10,6 @@ class Protection:
         """ constructor of class Protection"""
         self.__image = Image(imagePath)
         self.__axis_from_edges = None
-        self.__axis_from_dilated = None
         self.__right_direction = None
 
     def get_right_direction(self):
@@ -57,17 +56,6 @@ class Protection:
             self.__axis_from_edges = (start_point, end_point)
         return self.__axis_from_edges
 
-    def get_axis_from_dilated(self)->(tuple, tuple):
-        """
-            @parameters: the class itself
-            @returns: two points delimiting the horizontal axis approximating the protection. Gotten from dilated edges binary image
-        """
-        if self.__axis_from_dilated == None:
-            list_of_ones = ones_per_line(self.__image.dilate(1))
-            argmax = my_arg_max(list_of_ones)
-            my_dots = ((0,argmax[0]),(self.__image.get_resolution()[0], argmax[0]))
-            self.__axis_from_dilated = my_dots
-        return self.__axis_from_dilated
 
     def check_protection(self)-> bool:
         right_dir = self.get_right_direction()
