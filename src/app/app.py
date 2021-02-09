@@ -99,7 +99,7 @@ ROUTES
 @app.post("/predict_presence", response_model=presenceResponse)
 def presence(request: requestForm = Depends()):
     detector = ModelBasedDetector.from_finetuned(
-        "models/ssd_512_best.params", thresh=0.2
+        "models/fake400_7style+real_best.params", thresh=0.32499
     )
     uploaded_file = request.file
     filename = uploaded_file.filename
