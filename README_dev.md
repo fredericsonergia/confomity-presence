@@ -120,7 +120,7 @@ Les fichiers d'annotation sont à placer dans *VOC2021/Annotations*
 
 Ensuite il faut ajouter les noms (sans l'extension) aux fichiers Main/*.txt* soit dans le train.txt (pour compléter les données d'entraînement), soit dans le val.txt (pour compléter les données de validation), soit le test.txt (pour compléter les données de test)
 
-## CLI pour l'entraînement
+## CLI pour l'entraînement, l'évaluation et la prédiction
 
 Pour plus d'informations sur les arguments des CLI, voir **CLI_detector.py**
 
@@ -130,15 +130,21 @@ python CLI_detector.py train_from_pretrained (entrainement à partir du modèle 
 #exemple
 python CLI_detector.py train_from_pretrained --data_path='../Data/EAF' --save_prefix='save_name_model' --batch_size=10
 
+--------------------------------------------------------------------------
+
 python CLI_detector.py train_from_finetuned (entraînement à partir d'un modèle sauvegardé en local)
 
 #exemple 
 python CLI_detector.py train_from_finetuned --save_prefix='ssd_512' --data_path='../Data/EAF_real' --model_name='models/model_name_best.params' --batch_size=10 --epoch=15
 
+--------------------------------------------------------------------------
+
 python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux positif en affichant la matrice de  confusion dans la console et en le sauvegardant dans un fichier log dans *logs* et en sauvegardant la courbe ROC curve dans *results_ROC*)
 
 #exemple
 !python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_name='models/path/to/model' --taux_fp=0.143
+
+--------------------------------------------------------------------------
 
 python CLI_detector.py predict (faire une prédiction sur une image)
 
