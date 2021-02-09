@@ -85,7 +85,7 @@ Dans JPEGImages se trouvent les images d'extension *.jpg*
 Dans ImageSets/Main se trouvent le découpage en train, validation, test set
 
 ```bash
-the/name/of/the/root/file
+le/nom/du/dossier/racine
 └── VOC2021
   ├── Annotations
   ├── ImageSets
@@ -151,24 +151,39 @@ python CLI_detector.py predict (faire une prédiction sur une image)
 #exemple
 python CLI_detector.py predict model_name='models/ssd_512_best.params' input_path='inputs/EAF3.jpg' output_folder='outputs/' thresh=0.3 data_path_test='../Data/EAF_real'
 ```
-# Structure du repository
+# Structure du src
 
+Les dossiers en gras sont des endroits utiles dans lesquels on sauvegarde des données de l'entraînement et de l'évaluation
 
 ```bash
-├── Data
-│   ├── EAF_real
-│   │   └── VOC2021
-│   │       ├── Annotations
-│   │       ├── ImageSets
-│   │       │   └── Main
-│   │       └── JPEGImages
+└── src
+    ├── Detector
+    │   └── __pycache__
+    ├── app
+    │   ├── __pycache__
+    │   ├── models
+    │   ├── outputs
+    │   ├── tests
+    │   └── uploads
+    ├── conformity
+    ├── detector_utils
+    │   └── __pycache__
+    ├── inputs
+    ├── logs
+    ├── models
+    ├── outputs
+    ├── results_ROC
+    ├── results_train
+    └── tests
+
 └── src
     ├── Detector
     ├── app
-    │   ├── models (dossier où se trouve le modèle utilisé par lapp)
+    │   ├── echo -e "\e[1mmodel\e[0m" models (dossier où se trouve le modèle utilisé par lapp)
     │   ├── outputs (sortie du modèle)
     │   ├── tests
     │   └── uploads (entrée du modèle)
+    ├── conformity
     ├── detector_utils
     ├── inputs
     ├── logs (les logs notamment ceux concernant lévaluation)
