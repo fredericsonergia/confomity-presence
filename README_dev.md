@@ -94,6 +94,7 @@ Pour plus d'informations sur les arguments des CLI, voir **CLI_data.py**
 
 Vous pouvez renommer les images KO ou OK (en EAF_OK_chiffre.jpg ou EAF_KO_chiffre.jpg) d'un dossier avec la CLI suivante:
 
+```
 python CLI_data.py rename 
 
 #exemple 
@@ -101,6 +102,7 @@ python CLI_data.py rename
 python CLI_data.py rename --path='path/du/dossier/images' start=0 is_ok=True
 
 Après avoir renommer les images, il faut placer les images dans *VOC2021/JPEGImages*.
+```
 
 ### L'Annotation
 
