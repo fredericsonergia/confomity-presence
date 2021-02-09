@@ -6,7 +6,7 @@ import os
 from mxnet import nd
 import numpy as np
 from sklearn.metrics import roc_curve, auc
-
+from pathlib import Path
 
 CLASSES = ["cheminee", "eaf"]
 
@@ -25,35 +25,6 @@ def process_output_img(name_path):
     cv2.imwrite(output_image_path, rect)
     os.remove(name_path)
     return output_image_path
-
-
-def ROC_curve_thresh(y_true, y_scores, taux_fp, save_plot):
-    fpr, tpr, threshholds = roc_curve(y_true, y_scores)
-    arg = np.argmax(tpr[np.argwhere(fpr < taux_fp)])
-    opti_thresh = threshholds[arg]
-    print(
-        f"seuil de confiance optimal : {opti_thresh}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}"
-    )
-    roc_auc = auc(fpr, tpr)
-    if save_plot:
-        f = plt.figure()
-        lw = 2
-        plt.plot(
-            fpr,
-            tpr,
-            color="darkorange",
-            lw=lw,
-            label="ROC curve (area = %0.2f)" % roc_auc,
-        )
-        plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel("False Positive Rate")
-        plt.ylabel("True Positive Rate")
-        plt.title("Courbe ROC pour la détection de l'EAF")
-        plt.legend(loc="lower right")
-        f.savefig("results/ROC_curve.png")
-    return opti_thresh
 
 
 def get_test_set():
@@ -101,11 +72,13 @@ def plot_train(
     smooth_loss_val,
     map_list,
     save_prefix,
+    train_results_folder,
     save_plot=True,
 ):
     '''
     plot the outputs from training
     '''
+    Path(train_results_folder).mkdir(parents=True, exist_ok=True)
     f = plt.figure(figsize=(5, 10))
     ax = f.add_subplot(311)
 
@@ -128,4 +101,4 @@ def plot_train(
     plt.xlabel("epoch")
     plt.title("MAP for eaf")
     if save_plot:
-        f.savefig("results_train/" + save_prefix + "_train_curves.png")
+        f.savefig(results_train_folder + save_prefix + "_train_curves.png")

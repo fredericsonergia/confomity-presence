@@ -7,6 +7,7 @@ import numpy as np
 from gluoncv.data.transforms import image as timage
 from gluoncv.data.transforms import bbox as tbbox
 from gluoncv.data.transforms import experimental
+
 class VOCLike(VOCDetection):
     CLASSES = ["cheminee", "eaf"]
 
@@ -16,23 +17,10 @@ class VOCLike(VOCDetection):
         super(VOCLike, self).__init__(root, splits, transform, index_map, preload_label)
 
 
-def load_data_VOC(root="../Data/EAF_2labels"):
-    dataset = VOCLike(root=root, splits=[(2021, "trainval")])
-    val_dataset = VOCLike(root=root, splits=[(2021, "test")])
-    return dataset, val_dataset
-
-
-def get_pretrained_model(classes):
-    # ssd_512_resnet50_v1_voc
-    net = model_zoo.get_model(
-        "ssd_512_mobilenet1.0_custom",
-        classes=classes,
-        pretrained_base=False,
-        transfer="voc",
-    )
-    return net
-
 def new_trainloader_call(self, src, label):
+    '''
+    define a new call for trainloader by changing the data augmentation
+    '''
     # random color jittering
     img = experimental.image.random_color_distort(src)
 

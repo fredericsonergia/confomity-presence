@@ -13,15 +13,16 @@ from gluoncv import model_zoo
 from gluoncv import utils
 from mxnet import nd
 from sklearn.metrics import roc_curve, auc, confusion_matrix
+from pathlib import Path
 try:
     sys.path.append('../detector_utils')
-    from trainer import (VOCLike, get_pretrained_model,
-                                    ssd_train_dataloader, ssd_val_dataloader,
-                                    validate, save_params, get_ctx, val_loss)
+    from trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
+                          validate, save_params, get_ctx, val_loss)
 except:
-    from detector_utils.trainer import (VOCLike, get_pretrained_model,
-                                    ssd_train_dataloader, ssd_val_dataloader,
-                                    validate, save_params, get_ctx, val_loss)
+    from detector_utils.trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
+                                        validate, save_params, get_ctx, val_loss)
+
+
 CLASSES = ['cheminee', 'eaf']
 
 class BaseDetector(object):
@@ -33,13 +34,14 @@ class BaseDetector(object):
         self.save_prefix=None
 
 
-    def eval(self, taux_fp, save_plot):
+    def eval(self, taux_fp, save_plot, results_folder, log_folder):
         fpr,tpr,threshholds= roc_curve(self.y_true, self.y_scores)
         arg = np.argmax(tpr[np.argwhere(fpr < taux_fp)])
         fn = 1-tpr[arg]
         opti_thresh = threshholds[arg]
         print(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
         roc_auc = auc(fpr, tpr)
+        Path(results_folder).mkdir(parents=True, exist_ok=True)
         if save_plot:
             f =plt.figure()
             lw = 2
@@ -52,17 +54,18 @@ class BaseDetector(object):
             plt.ylabel('True Positive Rate')
             plt.title("Courbe ROC pour la détection de l'EAF")
             plt.legend(loc="lower right")
-            f.savefig('results_ROC/' + self.save_prefix + '_ROC_curve.png')
+            f.savefig(results.folder + self.save_prefix + '_ROC_curve.png')
         y_pred = np.asarray(self.y_scores >= opti_thresh).astype(int)
         matrice_confusion = confusion_matrix(self.y_true, y_pred)
-        if not os.path.exists('logs/eval.json'):
+        Path(log_folder).mkdir(parents=True, exist_ok=True)
+        if not os.path.exists(log_folder+'eval.json'):
             results =  {'model':[self.save_prefix],
                         'confusion_matrix': matrice_confusion.tolist(),
                         'seuil_optimal':[opti_thresh]}
-            with open('logs/eval.json', 'w') as json_file:
+            with open(log_folder+'eval.json', 'w') as json_file:
                 json.dump(results, json_file)
         else:
-            with open('logs/eval.json') as f:
+            with open(log_folder+'eval.json') as f:
                 data = json.load(f)
             data['model'].append(self.save_prefix)
             data['confusion_matrix'].append(matrice_confusion.tolist())
@@ -70,7 +73,7 @@ class BaseDetector(object):
             with open('logs/eval.json', 'w') as json_file:
                 json.dump(data, json_file)
             
-        with open('logs/'+'eval.log', 'a') as log:
+        with open(log_folder+'eval.log', 'a') as log:
             log.write(f"modèle: {self.save_prefix} \n seuil de confiance optimal : {opti_thresh:.3f}, \n on a un taux de faux positif de: {fpr[arg]} \n on a un taux de vrai positif de: {tpr[arg]} \n matrice de confusion: {matrice_confusion} \n on a un taux de faux négatif de: {fn} \n pour la condition taux de faux positif  < {taux_fp} \n")
         self.thresh = opti_thresh
 
@@ -95,17 +98,18 @@ class ModelBasedDetector(BaseDetector):
         self.mean_iou = None
         self.ctx = None
         self.batch_size = batch_size
+        self.classes=CLASSES
     
     @classmethod
-    def from_pretrained(cls, data_path, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512_test2'):
+    def from_pretrained(cls, data_path, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size)
 
     @classmethod
-    def from_finetuned(cls, name_model, data_path_test='../Data/EAF_real', batch_size=10, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
+    def from_finetuned(cls, name_model, data_path='../Data/EAF_real', data_path_test='../Data/EAF_real', batch_size=10, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
-        return cls(net=net, data_path_test=data_path_test, save_prefix=save_prefix, batch_size=batch_size, thresh=thresh)
+        return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size, thresh=thresh)
 
     def set_dataset(self, split=2021):
         self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'train')])
@@ -135,6 +139,7 @@ class ModelBasedDetector(BaseDetector):
             inter_scores = mx.nd.concat(true_scores,n_scores)
             ax = gcv.utils.viz.plot_bbox(orig_img, inter_bboxes[0], inter_scores[0], inter_box_ids[0], class_names=self.net.classes,thresh=self.thresh)
         plt.show()
+
     def set_tests(self):
         path_test = self.data_path_test + '/VOC2021/ImageSets/Main/test.txt'
         path_image = self.data_path_test + '/VOC2021/JPEGImages/'
@@ -178,14 +183,15 @@ class ModelBasedDetector(BaseDetector):
         except:
             self.ctx = [mx.cpu()]
 
-    def train(self, start_epoch, epoch):
+    def train(self, start_epoch, epoch, log_folder):
         print(self.batch_size)
         self.set_ctx()
         self.set_dataset()
         logging.basicConfig()
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)
-        log_file_path = 'logs/'+ self.save_prefix + '_train.log'
+        Path(log_folder).mkdir(parents=True, exist_ok=True)
+        log_file_path = log_folder+ self.save_prefix + '_train.log'
         log_dir = os.path.dirname(log_file_path)
         if log_dir and not os.path.exists(log_dir):
             os.makedirs(log_dir)
@@ -247,10 +253,6 @@ class ModelBasedDetector(BaseDetector):
             loss1_val, loss2_val = val_loss(self.net, self.loss_val_data, self.ctx)
             ce_loss_val.append(loss1_val)
             smooth_loss_val.append(loss2_val)
-            # if len(ce_loss_list) > 1 and epoch > 5:
-            #     if ce_loss_val[-1]>ce_loss_val[-2]:
-            #         print('Early stopping')
-            #         return
             ce_loss_list.append(np.mean(ce_list))
             logger.info('[Epoch {}] Validation, {}={:.3f}, {}={:.3f}'.format(
                 epoch, name1, loss1_val, name2, loss2_val))
@@ -279,9 +281,11 @@ class ModelBasedDetector(BaseDetector):
             plt.close(fig)
         else:
             plt.show()
+        box_coord=n_bboxes.asnumpy()[0][0].tolist()
+        box_coord_round=[int(coord) for coord in box_coord]
         score = n_scores.asnumpy()[0][0][0]
         prediction = score > self.thresh
-        return score, prediction
+        return score, prediction, box_coord_round
 
 
     @staticmethod

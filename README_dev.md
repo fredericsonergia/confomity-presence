@@ -63,19 +63,6 @@ Les arguments sont les suivants :
 -s : path vers le dossier d'images de reférence pour le style
 -c : path vers le dossier ou mettre les images stylisées
 
-# environnement
-
-## create
-
-```
-conda env create -f environment.yml
-conda activate presence
-```
-
-## update
-
-conda env export > environment.yml
-
 # Entrainement
 
 ## Avant l'entraînement
@@ -89,7 +76,7 @@ Dans JPEGImages se trouvent les images d'extension _.jpg_
 Dans ImageSets/Main se trouvent le découpage en train, validation, test set
 
 ```bash
-the/name/of/the/root/file
+le/nom/du/dossier/racine
 └── VOC2021
   ├── Annotations
   ├── ImageSets
@@ -108,13 +95,15 @@ Pour plus d'informations sur les arguments des CLI, voir **CLI_data.py**
 
 Vous pouvez renommer les images KO ou OK (en EAF_OK_chiffre.jpg ou EAF_KO_chiffre.jpg) d'un dossier avec la CLI suivante:
 
-python CLI_data.py rename
+```
+python CLI_data.py rename 
 
 #exemple
 
 python CLI_data.py rename --path='path/du/dossier/images' start=0 is_ok=True
 
-Après avoir renommer les images, il faut placer les images dans _VOC2021/JPEGImages_.
+Après avoir renommer les images, il faut placer les images dans *VOC2021/JPEGImages*.
+```
 
 ### L'Annotation
 
@@ -125,64 +114,63 @@ Les fichiers d'annotation sont à placer dans _VOC2021/Annotations_
 
 Ensuite il faut ajouter les noms (sans l'extension) aux fichiers Main/_.txt_ soit dans le train.txt (pour compléter les données d'entraînement), soit dans le val.txt (pour compléter les données de validation), soit le test.txt (pour compléter les données de test)
 
-## CLI pour l'entraînement, l'évaluation et la prédiction
+## Comment entraîné un modèle à partir du modèle pré entraîné fourni par gluoncv ?
 
 Pour plus d'informations sur les arguments des CLI, voir **CLI_detector.py**
 
 ```
-python CLI_detector.py train_from_pretrained (entrainement à partir du modèle pré-entraîné)
+python CLI_detector.py train_from_pretrained
 
 #exemple
-python CLI_detector.py train_from_pretrained --data_path='../Data/EAF' --save_prefix='save_name_model' --batch_size=10
+python CLI_detector.py train_from_pretrained --save_prefix='save_name_prefix' --data_path='../Data/EAF_real'  --batch_size=10 --epoch=15 --results_folder='results_ROC/' --log_foler='logs/'
 
---------------------------------------------------------------------------
+```
 
-python CLI_detector.py train_from_finetuned (entraînement à partir d'un modèle sauvegardé en local)
+En sortie:
+Sauvegarde les courbes d'entraînement dans le dossier indiqué en paramètre
+
+## Comment entraîné un modèle à partir d'un modèle en local ?
+
+Pour plus d'informations sur les arguments des CLI, voir **CLI_detector.py**
+
+```
+
+python CLI_detector.py train_from_finetuned 
+
+#exemple 
+python CLI_detector.py train_from_finetuned --save_prefix='save_name_prefix' --data_path='../Data/EAF_real' --model_path='models/model_name_best.params' --batch_size=10 --epoch=15  --results_folder='results_ROC/' --log_foler='logs/'
+
+```
+
+En sortie:
+Sauvegarde les courbes et les logs d'entraînement dans les dossiers indiqués en paramètre
+
+## Comment évaluer un modèle ?
+
+```
+python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux positif)
+
 
 #exemple
-python CLI_detector.py train_from_finetuned --save_prefix='ssd_512' --data_path='../Data/EAF_real' --model_name='models/model_name_best.params' --batch_size=10 --epoch=15
 
---------------------------------------------------------------------------
+python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_name='models/path/to/model' --taux_fp=0.143
+```
 
-python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux positif en affichant la matrice de  confusion dans la console et en le sauvegardant dans un fichier log dans *logs* et en sauvegardant la courbe ROC curve dans *results_ROC*)
+En sortie:
+Sauvegarde les logs (matrice de confusion) et résultat d'évaluation (ROC_curves) dans les dossiers indiqués en paramètre.
+## Comment faire une prédiction sur une image ?
 
-#exemple
-!python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_name='models/path/to/model' --taux_fp=0.143
 
---------------------------------------------------------------------------
-
+```
 python CLI_detector.py predict (faire une prédiction sur une image)
 
 #exemple
 python CLI_detector.py predict model_name='models/ssd_512_best.params' input_path='inputs/EAF3.jpg' output_folder='outputs/' thresh=0.3 data_path_test='../Data/EAF_real'
+
 ```
 
-# Structure du repository
-
-```bash
-├── Data
-│   ├── EAF_real
-│   │   └── VOC2021
-│   │       ├── Annotations
-│   │       ├── ImageSets
-│   │       │   └── Main
-│   │       └── JPEGImages
-└── src
-    ├── Detector
-    ├── conformity (dossier qui gère l\'evaluation de la conformité de l\'eaf)
-    ├── app
-    │   ├── models (dossier où se trouve le modèle utilisé par lapp)
-    │   ├── outputs (sortie du modèle)
-    │   ├── tests
-    │   └── uploads (entrée du modèle)
-    ├── detector_utils
-    ├── inputs
-    ├── logs (les logs notamment ceux concernant lévaluation)
-    ├── models (modèles en sortie des entraînements)
-    ├── outputs
-    ├── results_ROC (endroit où sont sauvegardés les courbes ROC)
-    ├── results_train (endroit où sont sauvegardés les courbes dentraînement)
-    └── tests
+En sortie:
+Sauvegarde l'image de la prédiction dans le dossier outpute renseigné en paramètre
 ```
 
 # La conformité
