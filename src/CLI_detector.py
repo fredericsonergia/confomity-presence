@@ -68,7 +68,7 @@ class Predictor(object):
         detector.set_labels_and_scores()
         detector.eval(taux_fp, save_plot)
 
-    def predict(self, model_name='models/ssd_512_best.params', input_path='inputs/EAF3.jpg', output_folder='outputs/', thresh=0.3, data_path_test='../Data/EAF_real'):
+    def predict(self, model_name='models/ssd_512_best.params', input_path='inputs/EAF3.jpg', output_folder='outputs/', thresh=0.2, data_path_test='../Data/EAF_real'):
         '''
         command line to predict with an input image and save the result 
         
@@ -79,8 +79,8 @@ class Predictor(object):
         - thresh (float): the threshold to determine if there is a protection regarde the model score
         '''
         detectorp = ModelBasedDetector.from_finetuned(model_name, thresh=thresh)
-        score, prediction = detectorp.predict(input_path, output_folder)
-        print(score, prediction)
+        score, prediction, box_coord = detectorp.predict(input_path, output_folder)
+        print(score, prediction, box_coord)
 
 
 

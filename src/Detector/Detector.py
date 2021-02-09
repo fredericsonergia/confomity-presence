@@ -16,13 +16,11 @@ from sklearn.metrics import roc_curve, auc, confusion_matrix
 from pathlib import Path
 try:
     sys.path.append('../detector_utils')
-    from trainer import (VOCLike, get_pretrained_model,
-                                    ssd_train_dataloader, ssd_val_dataloader,
-                                    validate, save_params, get_ctx, val_loss)
+    from trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
+                          validate, save_params, get_ctx, val_loss)
 except:
-    from detector_utils.trainer import (VOCLike, get_pretrained_model,
-                                    ssd_train_dataloader, ssd_val_dataloader,
-                                    validate, save_params, get_ctx, val_loss)
+    from detector_utils.trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
+                                        validate, save_params, get_ctx, val_loss)
 
 
 CLASSES = ['cheminee', 'eaf']
@@ -104,12 +102,12 @@ class ModelBasedDetector(BaseDetector):
     
     @classmethod
     def from_pretrained(cls, data_path, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512'):
-        net = model_zoo.get_model(base_model, classes=self.classes, pretrained_base=False, transfer='voc')
+        net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size)
 
     @classmethod
     def from_finetuned(cls, name_model, data_path='../Data/EAF_real', data_path_test='../Data/EAF_real', batch_size=10, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
-        net = model_zoo.get_model(base_model, classes=self.classes, pretrained_base=False, transfer='voc')
+        net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
         return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size, thresh=thresh)
 
@@ -283,10 +281,11 @@ class ModelBasedDetector(BaseDetector):
             plt.close(fig)
         else:
             plt.show()
-        box_coord=n_bboxes[0][0][0]
+        box_coord=n_bboxes.asnumpy()[0][0].tolist()
+        box_coord_round=[int(coord) for coord in box_coord]
         score = n_scores.asnumpy()[0][0][0]
         prediction = score > self.thresh
-        return score, prediction, box_coord
+        return score, prediction, box_coord_round
 
 
     @staticmethod
