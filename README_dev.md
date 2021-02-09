@@ -63,15 +63,6 @@ Les arguments sont les suivants :
 -s : path vers le dossier d'images de reférence pour le style
 -c : path vers le dossier ou mettre les images stylisées
 
-# environnement
-## create
-```
-conda env create -f environment.yml
-conda activate presence
-```
-## update
-
-conda env export > environment.yml
 
 
 # Entrainement

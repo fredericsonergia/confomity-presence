@@ -18,7 +18,6 @@ logs
 .gitlab-ci.yml
 uploads
 gluon-cv
-Tests
 src/app/models
 **.params
 Style
