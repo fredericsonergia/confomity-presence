@@ -169,6 +169,7 @@ python CLI_detector.py predict model_name='models/ssd_512_best.params' input_pat
 │   │       └── JPEGImages
 └── src
     ├── Detector
+    ├── conformity (dossier qui gère l\'evaluation de la conformité de l\'eaf)
     ├── app
     │   ├── models (dossier où se trouve le modèle utilisé par lapp)
     │   ├── outputs (sortie du modèle)
@@ -183,3 +184,70 @@ python CLI_detector.py predict model_name='models/ssd_512_best.params' input_pat
     ├── results_train (endroit où sont sauvegardés les courbes dentraînement)
     └── tests
 ```
+
+# La conformité
+La classe Conformity permet de créer un objet qui permet d'accéder aux éléments de conformité de l'eaf dans un chantier. 
+On peut créer cet objet comme suit:
+```
+my_conformity = Conformity(imagePath, tolerance)
+```
+Par défaut, **tolerance==0.02**
+
+On peut accéder aux informations de conformité en appelant la méthode get_conformity() de cette classe:
+```
+my_conformity.get_conformity()
+```
+
+L'objet de conformité est composé de différents sous objets qui décrivent un chantier: un objet pour la réglette, un objet pour la protection et un objet pour l'image elle même.
+
+## L'objet de réglette
+On peut le créer comme suit:
+```
+my_ruler = Ruler(imagePath)
+```
+
+Cet objet offre des accès publiques à des éléments décrivants la réglette ou sa conformité. En voici quelques exemples:
+```
+#Accès aux graduations
+my_ruler.get_digits()
+
+#Accès à la conformité de l'inclinaison de la réglette par rapport au sol
+my_ruler.check_inclinaison_conformity(tolerance)
+
+#Accès à l'axe de la réglette
+my_ruler.get_axis()
+```
+
+## L'objet de la protection
+On peut le créer comme suit:
+```
+my_protection = Protection(imagePath)
+```
+
+Cet objet offre des accès publiques à des éléments décrivants la protection ou sa conformité. En voici quelques exemples:
+```
+#Accès à l'axe de la protection
+my_protection.get_axis_from_edges()
+
+#Accès la conformité de la protection (protection détectée ou pas)
+my_protection.check_protection()
+```
+
+## L'objet d'Image
+Cet objet permet d'avoir une version de l'image correspondant à celle que prend la pipeline de conformité en entrée.
+On peut créer cet objet comme suit:
+```
+my_image = Image(imagePath)
+```
+Cet objet offre des accès à des formes transformées de l'image initiale comme: 
+```
+#Accès à la versions B&W
+my_image.gray_scale()
+
+#Accès à l'image des bords
+my_image.edges_detection()
+
+#Accès à l'image des bords dilatés
+my_image.dilate(iteration)
+```
+
