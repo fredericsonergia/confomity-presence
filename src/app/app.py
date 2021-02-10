@@ -124,8 +124,6 @@ def presence(request: requestForm = Depends()):
     )
     uploaded_file = request.file
     filename = uploaded_file.filename
-    if not filename:
-        return jsonify({"msg": "Votre fichier n'a pas de nom."}), 400
     if allowed_file(filename):
         with open(os.path.join(settings.UPLOAD_FOLDER, filename), "wb") as buffer:
             shutil.copyfileobj(uploaded_file.file, buffer)
@@ -133,15 +131,6 @@ def presence(request: requestForm = Depends()):
             os.path.join(settings.UPLOAD_FOLDER, filename), settings.OUTPUT_FOLDER,
         )
         output_image_path = os.path.join(settings.OUTPUT_FOLDER, filename)
-    else:
-        return (
-            jsonify(
-                {
-                    "msg": f"Les extensions autorisées sont {', '.join(ALLOWED_EXTENSIONS)}."
-                }
-            ),
-            400,
-        )
     encoded_img = get_response_image(output_image_path)
     return {
         "score": score,
@@ -155,8 +144,6 @@ def presence(request: requestForm = Depends()):
 def conformity(request: requestForm = Depends()):
     uploaded_file = request.file
     filename = uploaded_file.filename
-    if not filename:
-        return jsonify({"msg": "Votre fichier n'a pas de nom."}), 400
     if allowed_file(filename):
         with open(os.path.join(settings.UPLOAD_FOLDER, filename), "wb") as buffer:
             shutil.copyfileobj(uploaded_file.file, buffer)
