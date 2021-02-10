@@ -1,3 +1,8 @@
+# Test
+
+```
+python -m unittest discover -s tests
+```
 Voici le repository pour le server du projet DTY du Paris Digital Lab pour Sonergia.
 
 Il contient :

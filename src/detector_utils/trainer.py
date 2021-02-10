@@ -59,6 +59,9 @@ def new_trainloader_call(self, src, label):
 def ssd_train_dataloader(
     net, train_dataset, data_shape=512, batch_size=10, num_workers=0
 ):
+    '''
+    returns the train loader from gluoncv
+    '''
     from gluoncv.data.batchify import Tuple, Stack, Pad
     from gluoncv.data.transforms.presets.ssd import SSDDefaultTrainTransform
 
@@ -83,6 +86,9 @@ def ssd_train_dataloader(
 
 
 def ssd_val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0):
+    '''
+    returns the validation loader from gluoncv
+    '''
     from gluoncv.data.batchify import Tuple, Stack, Pad
     from gluoncv.data.transforms.presets.ssd import SSDDefaultValTransform
 
@@ -103,10 +109,7 @@ def ssd_val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0
 
 def validate(net, val_data, ctx, eval_metric, flip_test=False):
     """
-    
-    validation on MAP
-    Args:
-    -
+    validation on MAP (mean average precision)
     """
     eval_metric.reset()
     net.flip_test = flip_test

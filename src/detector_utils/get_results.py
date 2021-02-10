@@ -27,43 +27,6 @@ def process_output_img(name_path):
     return output_image_path
 
 
-def get_test_set():
-    path_test = "../Data/EAF_2labels/VOC2021/ImageSets/Main/test.txt"
-    path_image = "../Data/EAF_2labels/VOC2021/JPEGImages/"
-    img_list = []
-    with open(path_test, "r") as f:
-        readlines = f.read()
-        img_list = readlines.split("\n")
-    pather = lambda x: path_image + x + ".jpg"
-    img_list = list(map(pather, img_list))
-    return img_list
-
-
-def get_labels_and_scores(val_dataset, test_img_list, net):
-    transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
-    test_true = val_dataset.transform(transf)
-    y_true = np.zeros((len(val_dataset)))
-    y_scores = np.zeros((len(val_dataset)))
-    iou_list = np.zeros((len(val_dataset)))
-    x_list_test, _ = gcv.data.transforms.presets.ssd.load_test(test_img_list, 512)
-    for i, (x, data) in enumerate(zip(x_list_test, test_true)):
-        _, label, _ = data
-        _, _, true_bboxes = filter_eaf(
-            nd.array([label[:, :4]]),
-            nd.array([label[:, 4:5]]),
-            nd.array(np.ones(shape=(1, 2, 1))),
-        )
-        box_ids, scores, bboxes = net(x)
-        _, n_scores, n_bboxes = filter_eaf(bboxes, box_ids, scores)
-        iou = utils.bbox_iou(true_bboxes[0].asnumpy(), n_bboxes[0].asnumpy())
-        iou_list[i] = iou
-        if 1 in label[:, 4:5]:
-            y_true[i] = 1
-        y_scores[i] = n_scores.asnumpy()[0][0][0]
-    mean_iou = np.mean(iou_list[iou_list > 0])
-    return y_true, y_scores, mean_iou
-
-
 def plot_train(
     epochs,
     ce_loss_list,

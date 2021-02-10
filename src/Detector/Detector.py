@@ -53,8 +53,9 @@ class BaseDetector(object):
             plt.xlabel('False Positive Rate')
             plt.ylabel('True Positive Rate')
             plt.title("Courbe ROC pour la détection de l'EAF")
+            plt.suptitle(f"modèle: {self.save_prefix}")
             plt.legend(loc="lower right")
-            f.savefig(results.folder + self.save_prefix + '_ROC_curve.png')
+            f.savefig(results_folder + self.save_prefix + '_ROC_curve.png')
         y_pred = np.asarray(self.y_scores >= opti_thresh).astype(int)
         matrice_confusion = confusion_matrix(self.y_true, y_pred)
         Path(log_folder).mkdir(parents=True, exist_ok=True)
@@ -78,7 +79,7 @@ class BaseDetector(object):
         self.thresh = opti_thresh
 
 class ModelBasedDetector(BaseDetector):
-    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test',data_path='../Data/EAF_real',
+    def __init__(self, net=None, thresh=None, save_prefix='ssd_512_test', data_path='../Data/EAF_real',
                  data_path_test='../Data/EAF_real',train_dataloader=ssd_train_dataloader,
                  val_dataloader=ssd_val_dataloader, batch_size=10):
         super().__init__()
@@ -98,8 +99,7 @@ class ModelBasedDetector(BaseDetector):
         self.mean_iou = None
         self.ctx = None
         self.batch_size = batch_size
-        self.classes=CLASSES
-    
+
     @classmethod
     def from_pretrained(cls, data_path, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
@@ -111,17 +111,17 @@ class ModelBasedDetector(BaseDetector):
         net.load_parameters(name_model)
         return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size, thresh=thresh)
 
-    def set_dataset(self, split=2021):
+    def _set_dataset(self, split=2021):
         self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'train')])
         self.val_dataset = VOCLike(root=self.data_path, splits=[(split, 'val')])
         self.train_data = self.train_dataloader(self.net, self.train_dataset, batch_size=self.batch_size)
         self.val_data = self.val_dataloader(self.val_dataset, batch_size=self.batch_size)
         self.loss_val_data = self.train_dataloader(self.net, self.val_dataset, batch_size=self.batch_size)
 
-    def set_test_dataset(self, split=2021):
+    def _set_test_dataset(self, split=2021):
         self.test_dataset = VOCLike(root=self.data_path_test, splits=[(split, 'test')])
 
-    def plot_predict(self):
+    def _plot_predict(self):
         self.set_test_dataset()
         transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
         test_true = self.test_dataset.transform(transf)
@@ -140,7 +140,7 @@ class ModelBasedDetector(BaseDetector):
             ax = gcv.utils.viz.plot_bbox(orig_img, inter_bboxes[0], inter_scores[0], inter_box_ids[0], class_names=self.net.classes,thresh=self.thresh)
         plt.show()
 
-    def set_tests(self):
+    def _set_tests(self):
         path_test = self.data_path_test + '/VOC2021/ImageSets/Main/test.txt'
         path_image = self.data_path_test + '/VOC2021/JPEGImages/'
         img_list = []
@@ -149,10 +149,9 @@ class ModelBasedDetector(BaseDetector):
             img_list = readlines.split('\n')
         pather = lambda x: path_image + x +'.jpg'
         img_list = list(map(pather, img_list))
-        print(img_list)
         self.tests_set = img_list
 
-    def set_labels_and_scores(self):
+    def _set_labels_and_scores(self):
         self.set_test_dataset()
         transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
         test_true = self.test_dataset.transform(transf)
@@ -184,7 +183,6 @@ class ModelBasedDetector(BaseDetector):
             self.ctx = [mx.cpu()]
 
     def train(self, start_epoch, epoch, log_folder):
-        print(self.batch_size)
         self.set_ctx()
         self.set_dataset()
         logging.basicConfig()

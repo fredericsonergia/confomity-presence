@@ -2,6 +2,8 @@ import fire
 import time 
 from Detector.Detector import ModelBasedDetector
 from detector_utils.get_results import plot_train
+
+
 class Predictor(object):
 
     def train_from_pretrained(self, batch_size=10, data_path='../Data/EAF_real', save_prefix='ssd_512',
@@ -51,7 +53,8 @@ class Predictor(object):
         print("the training took " + str(end - start) + " seconds")
 
     def eval(self, data_path_test='../Data/EAF_real', save_prefix='ssd_512_test2',
-             model_path='models/ssd_512_best.params', taux_fp=0.05, save_plot=True, results_folder='results_ROC/', log_foler='logs/'):
+             model_path='models/ssd_512_best.params', taux_fp=0.05, save_plot=True,
+             results_folder='results_ROC/', log_foler='logs/'):
         '''
         command line to evaluate the model on a test dataset
         Args:
