@@ -4,6 +4,27 @@ Plus de détail sont disponibles dans le README_dev ou dans la documentation tec
 
 # Installation
 
+Au début de l'installation vous pouvez créer un environnement virtuel avec la commande :
+
+```bash
+python3 -m venv nom
+```
+
+Puis l'activer avec
+
+windows:
+
+```bash
+nom\Scripts\activate.bat
+```
+
+macOS :
+
+```bash
+source nom/bin/activate
+
+```
+
 Pour installer toutes les dependances nécéssaires à ce projet lancé la commande suivante:
 
 ```bash

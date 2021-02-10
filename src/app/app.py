@@ -84,6 +84,16 @@ class presenceResponse(BaseModel):
     box: list
     prediction: bool
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "score": "score de confiance entre 0 et 1",
+                "image": "image encodé en bytes",
+                "box": "list qui définisse le rectangle de justification [xmin,ymin,xmax,ymax]",
+                "prediction": "True si presence de protection, False sinon",
+            }
+        }
+
 
 class conformityResponse(BaseModel):
     type: str
@@ -91,13 +101,23 @@ class conformityResponse(BaseModel):
     distance: Optional[float]
     message: Optional[str]
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "type": "error si le model n'arrive pas à traiter l'image, valid sinon",
+                "image": "image encodé en bytes",
+                "distance": "si type est valid : distance mesurée en cm, None sinon",
+                "message": "si type est error : message à renvoyer à l'utilisateur pour expliquer l'erreur",
+            }
+        }
+
 
 """
 ROUTES
 """
 
 
-@app.post("/predict_presence", response_model=presenceResponse)
+@app.post("/presence", response_model=presenceResponse)
 def presence(request: requestForm = Depends()):
     detector = ModelBasedDetector.from_finetuned(
         "models/fake400_7style+real_best.params", thresh=0.32499
@@ -123,10 +143,15 @@ def presence(request: requestForm = Depends()):
             400,
         )
     encoded_img = get_response_image(output_image_path)
-    return {"score": score, "image": encoded_img, 'box': box_coord, "prediction": prediction}
+    return {
+        "score": score,
+        "image": encoded_img,
+        "box": box_coord,
+        "prediction": prediction,
+    }
 
 
-@app.post("/predict_conformity", response_model=conformityResponse)
+@app.post("/conformity", response_model=conformityResponse)
 def conformity(request: requestForm = Depends()):
     uploaded_file = request.file
     filename = uploaded_file.filename
