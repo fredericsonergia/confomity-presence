@@ -40,3 +40,5 @@ uvicorn app:app
 ```
 
 # Documentation des differentes routes de l'api
+
+La documentation de l'api se trouve dans le fichier swagger.json sui se trouve dans le dossier src/app

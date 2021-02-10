@@ -81,6 +81,7 @@ class requestForm:
 class presenceResponse(BaseModel):
     score: float
     image: str
+    box: list
     prediction: bool
 
 
@@ -108,7 +109,7 @@ def presence(request: requestForm = Depends()):
     if allowed_file(filename):
         with open(os.path.join(settings.UPLOAD_FOLDER, filename), "wb") as buffer:
             shutil.copyfileobj(uploaded_file.file, buffer)
-        score, prediction = detector.predict(
+        score, prediction, box_coord = detector.predict(
             os.path.join(settings.UPLOAD_FOLDER, filename), settings.OUTPUT_FOLDER,
         )
         output_image_path = os.path.join(settings.OUTPUT_FOLDER, filename)
@@ -122,7 +123,7 @@ def presence(request: requestForm = Depends()):
             400,
         )
     encoded_img = get_response_image(output_image_path)
-    return {"score": score, "image": encoded_img, "prediction": prediction}
+    return {"score": score, "image": encoded_img, 'box': box_coord, "prediction": prediction}
 
 
 @app.post("/predict_conformity", response_model=conformityResponse)
