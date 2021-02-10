@@ -12,7 +12,10 @@ class CliDataTestCase(unittest.TestCase):
 
   def test_rename(self):
     name =['EAF_OK1.jpg','EAF_OK2.jpg']
-    rename_img('test_data/rename_data/')
-    rename = os.listdir('test_data/rename_data/')
+    rename_img('tests/test_data/rename_data/')
+    rename = os.listdir('tests/test_data/rename_data/')
     self.assertIn(rename[0], name)
     self.assertIn(rename[1], name)
+
+if __name__ == '__main__':
+  unittest.main()

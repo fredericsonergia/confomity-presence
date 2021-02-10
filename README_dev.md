@@ -1,9 +1,13 @@
+Voici le repository pour le server du projet DTY du Paris Digital Lab pour Sonergia contenant le cas d'usage de détection de l'écart au feu et de sa conformité.
+
 # Test
+
+Avant d'effectuer le test :
+- mettre dans tests/test_data/models le modèle.
 
 ```
 python -m unittest discover -s tests
-```
-Voici le repository pour le server du projet DTY du Paris Digital Lab pour Sonergia.
+````
 
 Il contient :
 

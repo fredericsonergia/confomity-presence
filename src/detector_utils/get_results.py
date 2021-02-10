@@ -64,4 +64,4 @@ def plot_train(
     plt.xlabel("epoch")
     plt.title("MAP for eaf")
     if save_plot:
-        f.savefig(results_train_folder + save_prefix + "_train_curves.png")
+        f.savefig(train_results_folder + save_prefix + "_train_curves.png")

@@ -10,6 +10,8 @@ Au début de l'installation vous pouvez créer un environnement virtuel avec la 
 python3 -m venv nom
 ```
 
+ajouter le nom de l'environnemment dans le .gitignore
+
 Puis l'activer avec
 
 windows:
@@ -30,6 +32,7 @@ Pour installer toutes les dependances nécéssaires à ce projet lancé la comma
 ```bash
 pip install -r requirements.txt
 ```
+
 
 Pour ensuite lancer le server utilisez les commandes suivantes :
 
