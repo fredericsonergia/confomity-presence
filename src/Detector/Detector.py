@@ -19,7 +19,7 @@ try:
     from trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
                           validate, save_params, get_ctx, val_loss)
 except:
-    from detector_utils.trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
+    from src.detector_utils.trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
                                         validate, save_params, get_ctx, val_loss)
 
 
@@ -101,7 +101,7 @@ class ModelBasedDetector(BaseDetector):
         self.batch_size = batch_size
 
     @classmethod
-    def from_pretrained(cls, data_path, batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512'):
+    def from_pretrained(cls, data_path, data_path_test='../Data/EAF_real', batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size)
 
@@ -122,7 +122,7 @@ class ModelBasedDetector(BaseDetector):
         self.test_dataset = VOCLike(root=self.data_path_test, splits=[(split, 'test')])
 
     def _plot_predict(self):
-        self.set_test_dataset()
+        self._set_test_dataset()
         transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
         test_true = self.test_dataset.transform(transf)
         items = self.test_dataset._items
@@ -152,7 +152,7 @@ class ModelBasedDetector(BaseDetector):
         self.tests_set = img_list
 
     def _set_labels_and_scores(self):
-        self.set_test_dataset()
+        self._set_test_dataset()
         transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
         test_true = self.test_dataset.transform(transf)
         y_true= np.zeros((len(self.test_dataset)))
@@ -175,16 +175,16 @@ class ModelBasedDetector(BaseDetector):
             f.write(f"L'intersection over union moyen est : {mean_iou:.3f}\n")
         self.y_true, self.y_scores, self.mean_iou = y_true, y_scores, mean_iou
 
-    def set_ctx(self):
+    def _set_ctx(self):
         try:
             a = mx.nd.zeros((1,), ctx=mx.gpu(0))
             self.ctx = [mx.gpu(0)]
         except:
             self.ctx = [mx.cpu()]
 
-    def train(self, start_epoch, epoch, log_folder):
-        self.set_ctx()
-        self.set_dataset()
+    def train(self, start_epoch, epoch, log_folder, model_folder):
+        self._set_ctx()
+        self._set_dataset()
         logging.basicConfig()
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)
@@ -259,7 +259,8 @@ class ModelBasedDetector(BaseDetector):
             map_name, mean_ap = validate(self.net, self.val_data, self.ctx, eval_metric)
             val_msg = '\n'.join(['{}={}'.format(k, v) for k, v in zip(map_name, mean_ap)])
             current_map = mean_ap[1]
-            save_params(self.net, best_map, current_map, epoch, self.save_prefix)
+            Path(model_folder).mkdir(parents=True, exist_ok=True)
+            save_params(self.net, best_map, current_map, epoch, log_folder, self.save_prefix, model_folder=model_folder)
             map_list.append(current_map)
             logger.info('[Epoch {}] Validation: \n{}'.format(epoch, val_msg))
         return epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list

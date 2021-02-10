@@ -7,7 +7,7 @@ from detector_utils.get_results import plot_train
 class Predictor(object):
 
     def train_from_pretrained(self, batch_size=10, data_path='../Data/EAF_real', save_prefix='ssd_512',
-                              start_epoch=0, epochs=10, save_plot=True, train_result_folder='results_train/',
+                              start_epoch=0, epochs=10, save_plot=True, model_folder='models/', train_result_folder='results_train/',
                               log_folder='logs/'):
         '''
         command line to train from the pretrained ssd_512_mobile_net model
@@ -67,8 +67,8 @@ class Predictor(object):
         - log_folder (str): the folder in which we save logs
         '''
         detector = ModelBasedDetector.from_finetuned(model_path, data_path_test, save_prefix=save_prefix)
-        detector.set_tests()
-        detector.set_labels_and_scores()
+        detector._set_tests()
+        detector._set_labels_and_scores()
         detector.eval(taux_fp, save_plot)
 
     def predict(self, model_name='models/ssd_512_best.params', input_path='inputs/EAF3.jpg', output_folder='outputs/', thresh=0.2, data_path_test='../Data/EAF_real'):
