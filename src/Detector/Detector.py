@@ -53,6 +53,7 @@ class BaseDetector(object):
             plt.xlabel('False Positive Rate')
             plt.ylabel('True Positive Rate')
             plt.title("Courbe ROC pour la détection de l'EAF")
+            plt.suptitle(f"modèle: {self.save_prefix}")
             plt.legend(loc="lower right")
             f.savefig(results.folder + self.save_prefix + '_ROC_curve.png')
         y_pred = np.asarray(self.y_scores >= opti_thresh).astype(int)
