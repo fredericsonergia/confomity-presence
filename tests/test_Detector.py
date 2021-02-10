@@ -1,8 +1,7 @@
 import unittest
-import sys 
 
 from gluoncv import model_zoo
-from Detector.Detector import ModelBasedDetector
+from src.Detector.Detector import ModelBasedDetector
 
 
 class ModelBasedDetectorTestCase(unittest.TestCase):
