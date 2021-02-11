@@ -1,7 +1,7 @@
-from Ruler import Ruler
-from Protection import Protection
-from Image import Image
-from helpers import (
+from src.conformity.Ruler import Ruler
+from src.conformity.Protection import Protection
+from src.conformity.Image import Image
+from src.conformity.helpers import (
     slope_ordinate,
     find_intersection,
     approximate_text_by_point,

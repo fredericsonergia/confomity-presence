@@ -7,7 +7,7 @@ import shutil
 import io
 from base64 import encodebytes
 from PIL import Image
-import settings
+from src.app import settings
 import os
 import matplotlib
 
@@ -17,8 +17,8 @@ import sys
 sys.path.append("../Detector")
 sys.path.append("../conformity")
 
-from Detector import ModelBasedDetector
-from Conformity import Conformity
+from src.Detector.Detector import ModelBasedDetector
+from src.conformity.Conformity import Conformity
 
 sys.path.append("/utils")
 
@@ -81,7 +81,18 @@ class requestForm:
 class presenceResponse(BaseModel):
     score: float
     image: str
+    box: list
     prediction: bool
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "score": "score de confiance entre 0 et 1",
+                "image": "image encodé en bytes",
+                "box": "list qui définit le rectangle de justification [xmin,ymin,xmax,ymax]",
+                "prediction": "True si presence de protection, False sinon",
+            }
+        }
 
 
 class conformityResponse(BaseModel):
@@ -90,13 +101,23 @@ class conformityResponse(BaseModel):
     distance: Optional[float]
     message: Optional[str]
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "type": "error si le model n'arrive pas à traiter l'image, valid sinon",
+                "image": "image encodé en bytes",
+                "distance": "si type est valid : distance mesurée en cm, None sinon",
+                "message": "si type est error : message à renvoyer à l'utilisateur pour expliquer l'erreur",
+            }
+        }
+
 
 """
 ROUTES
 """
 
 
-@app.post("/predict_presence", response_model=presenceResponse)
+@app.post("/presence", response_model=presenceResponse)
 def presence(request: requestForm = Depends()):
     detector = ModelBasedDetector.from_finetuned(
         "models/fake400_7style+real_best.params", thresh=0.32499
@@ -108,7 +129,7 @@ def presence(request: requestForm = Depends()):
     if allowed_file(filename):
         with open(os.path.join(settings.UPLOAD_FOLDER, filename), "wb") as buffer:
             shutil.copyfileobj(uploaded_file.file, buffer)
-        score, prediction = detector.predict(
+        score, prediction, box_coord = detector.predict(
             os.path.join(settings.UPLOAD_FOLDER, filename), settings.OUTPUT_FOLDER,
         )
         output_image_path = os.path.join(settings.OUTPUT_FOLDER, filename)
@@ -122,10 +143,15 @@ def presence(request: requestForm = Depends()):
             400,
         )
     encoded_img = get_response_image(output_image_path)
-    return {"score": score, "image": encoded_img, "prediction": prediction}
+    return {
+        "score": score,
+        "image": encoded_img,
+        "box": box_coord,
+        "prediction": prediction,
+    }
 
 
-@app.post("/predict_conformity", response_model=conformityResponse)
+@app.post("/conformity", response_model=conformityResponse)
 def conformity(request: requestForm = Depends()):
     uploaded_file = request.file
     filename = uploaded_file.filename

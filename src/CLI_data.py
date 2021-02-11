@@ -1,4 +1,4 @@
-from detector_utils.VOC_form import rename_img, add_text
+from detector_utils.VOC_form import rename_img
 import os 
 import fire
 class Data_processor(object):
