@@ -102,6 +102,9 @@ class conformityResponse(BaseModel):
     image: Optional[str]
     distance: Optional[float]
     message: Optional[str]
+    intersection: Optional[tuple]
+    ruler_axis: Optional[tuple]
+    protection_axis: Optional[tuple]
 
     class Config:
         schema_extra = {
@@ -110,6 +113,9 @@ class conformityResponse(BaseModel):
                 "image": "image encodé en bytes",
                 "distance": "si type est valid : distance mesurée en cm, None sinon",
                 "message": "si type est error : message à renvoyer à l'utilisateur pour expliquer l'erreur",
+                "intersection": "si type est valid, tuple des coordonées de l'intersection",
+                "ruler_axis": "Deux points qui définissent l'axe de la règle",
+                "protection_axis": "Deux points qui définissent l'axe de la protection",
             }
         }
 
