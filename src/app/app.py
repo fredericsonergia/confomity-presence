@@ -7,7 +7,7 @@ import shutil
 import io
 from base64 import encodebytes
 from PIL import Image
-import settings
+from src.app import settings
 import os
 import matplotlib
 
@@ -17,8 +17,8 @@ import sys
 sys.path.append("../Detector")
 sys.path.append("../conformity")
 
-from Detector import ModelBasedDetector
-from Conformity import Conformity
+from src.Detector.Detector import ModelBasedDetector
+from src.conformity.Conformity import Conformity
 
 sys.path.append("/utils")
 

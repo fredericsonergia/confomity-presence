@@ -161,6 +161,7 @@ def save_params(net, best_map, current_map, epoch, log_folder, prefix="ssd_512",
     if current_map > best_map[0]:
         best_map[0] = current_map
         net.save_parameters(model_folder + "{:s}_best.params".format(prefix))
+        print('model saved')
         with open(log_folder + prefix + "_best_map.log", "a") as f:
             f.write("{:04d}:\t{:.4f}\n".format(epoch, current_map))
 

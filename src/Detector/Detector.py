@@ -15,9 +15,8 @@ from mxnet import nd
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 from pathlib import Path
 try:
-    sys.path.append('../detector_utils')
-    from trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
-                          validate, save_params, get_ctx, val_loss)
+    from detector_utils.trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
+                                        validate, save_params, get_ctx, val_loss)
 except:
     from src.detector_utils.trainer import (VOCLike, ssd_train_dataloader, ssd_val_dataloader,
                                         validate, save_params, get_ctx, val_loss)
@@ -39,7 +38,6 @@ class BaseDetector(object):
         arg = np.argmax(tpr[np.argwhere(fpr < taux_fp)])
         fn = 1-tpr[arg]
         opti_thresh = threshholds[arg]
-        print(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n pour la condition taux de faux positif  < {taux_fp}')
         roc_auc = auc(fpr, tpr)
         Path(results_folder).mkdir(parents=True, exist_ok=True)
         if save_plot:
@@ -73,7 +71,7 @@ class BaseDetector(object):
             data['seuil_optimal'].append(opti_thresh)
             with open('logs/eval.json', 'w') as json_file:
                 json.dump(data, json_file)
-            
+        print(f'seuil de confiance optimal : {opti_thresh:.3f}, \n avec un taux de faux positif de: {fpr[arg]} \n avec un taux de vrai positif de: {tpr[arg]} \n matrice de confusion: {matrice_confusion} \n pour la condition taux de faux positif  < {taux_fp}')
         with open(log_folder+'eval.log', 'a') as log:
             log.write(f"modèle: {self.save_prefix} \n seuil de confiance optimal : {opti_thresh:.3f}, \n on a un taux de faux positif de: {fpr[arg]} \n on a un taux de vrai positif de: {tpr[arg]} \n matrice de confusion: {matrice_confusion} \n on a un taux de faux négatif de: {fn} \n pour la condition taux de faux positif  < {taux_fp} \n")
         self.thresh = opti_thresh
@@ -103,13 +101,13 @@ class ModelBasedDetector(BaseDetector):
     @classmethod
     def from_pretrained(cls, data_path, data_path_test='../Data/EAF_real', batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='ssd_512'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
-        return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size)
+        return cls(net=net, data_path=data_path, data_path_test=data_path_test, save_prefix=save_prefix, batch_size=batch_size)
 
     @classmethod
     def from_finetuned(cls, name_model, data_path='../Data/EAF_real', data_path_test='../Data/EAF_real', batch_size=10, base_model='ssd_512_mobilenet1.0_custom', thresh=0.3, save_prefix='ssd_512_test2'):
         net = model_zoo.get_model(base_model, classes=CLASSES, pretrained_base=False, transfer='voc')
         net.load_parameters(name_model)
-        return cls(net=net, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size, thresh=thresh)
+        return cls(net=net, data_path=data_path, data_path_test=data_path_test, save_prefix=save_prefix, batch_size=batch_size, thresh=thresh)
 
     def _set_dataset(self, split=2021):
         self.train_dataset = VOCLike(root=self.data_path, splits=[(split, 'train')])
@@ -151,7 +149,7 @@ class ModelBasedDetector(BaseDetector):
         img_list = list(map(pather, img_list))
         self.tests_set = img_list
 
-    def _set_labels_and_scores(self):
+    def _set_labels_and_scores(self, log_folder):
         self._set_test_dataset()
         transf = gcv.data.transforms.presets.rcnn.FasterRCNNDefaultValTransform(512)
         test_true = self.test_dataset.transform(transf)
@@ -171,7 +169,9 @@ class ModelBasedDetector(BaseDetector):
                 y_true[i] = 1
             y_scores[i] = n_scores.asnumpy()[0][0][0]
         mean_iou = np.mean(iou_list[iou_list > 0])
-        with open('logs/'+'eval.log', 'a') as f:
+        print(y_true, y_scores)
+        Path(log_folder).mkdir(parents=True, exist_ok=True)
+        with open(log_folder + 'eval.log', "a") as f:
             f.write(f"L'intersection over union moyen est : {mean_iou:.3f}\n")
         self.y_true, self.y_scores, self.mean_iou = y_true, y_scores, mean_iou
 
@@ -260,7 +260,7 @@ class ModelBasedDetector(BaseDetector):
             val_msg = '\n'.join(['{}={}'.format(k, v) for k, v in zip(map_name, mean_ap)])
             current_map = mean_ap[1]
             Path(model_folder).mkdir(parents=True, exist_ok=True)
-            save_params(self.net, best_map, current_map, epoch, log_folder, self.save_prefix, model_folder=model_folder)
+            save_params(self.net, best_map, current_map, epoch, log_folder, self.save_prefix, model_folder)
             map_list.append(current_map)
             logger.info('[Epoch {}] Validation: \n{}'.format(epoch, val_msg))
         return epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list
@@ -272,6 +272,7 @@ class ModelBasedDetector(BaseDetector):
         n_box_ids, n_scores, n_bboxes = ModelBasedDetector.filter_eaf(bboxes, box_ids, scores)
         fig = plt.figure()
         ax = fig.add_subplot(111)
+        Path(output_path).mkdir(parents=True, exist_ok=True)
         ax = utils.viz.plot_bbox(img, n_bboxes[0], n_scores[0],
                                 n_box_ids[0], class_names=self.net.classes, ax=ax, thresh=self.thresh)
         plt.axis('off')

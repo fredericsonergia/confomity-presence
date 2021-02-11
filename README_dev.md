@@ -162,7 +162,7 @@ python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux 
 
 #exemple
 
-python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_name='models/path/to/model' --taux_fp=0.143
+python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_path='models/path/to/model' --taux_fp=0.143 --results_folder='results_ROC/' --log_folder='logs/'
 ```
 
 En sortie:
