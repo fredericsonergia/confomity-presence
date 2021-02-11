@@ -89,7 +89,7 @@ class presenceResponse(BaseModel):
             "example": {
                 "score": "score de confiance entre 0 et 1",
                 "image": "image encodé en bytes",
-                "box": "list qui définisse le rectangle de justification [xmin,ymin,xmax,ymax]",
+                "box": "list qui définit le rectangle de justification [xmin,ymin,xmax,ymax]",
                 "prediction": "True si presence de protection, False sinon",
             }
         }

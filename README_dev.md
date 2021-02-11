@@ -1,5 +1,10 @@
 Voici le repository pour le server du projet DTY du Paris Digital Lab pour Sonergia contenant le cas d'usage de détection de l'écart au feu et de sa conformité.
 
+# Installation
+
+Pour installer l'environnement veuillez regarder le README_usage.mdr
+
+
 # Test
 
 Avant d'effectuer le test :
