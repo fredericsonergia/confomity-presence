@@ -9,6 +9,7 @@ from base64 import encodebytes
 from PIL import Image
 import os
 import matplotlib
+import keras_ocr
 
 matplotlib.use("agg")
 import sys
@@ -143,12 +144,15 @@ def presence(request: requestForm = Depends()):
 
 @app.post("/conformity", response_model=conformityResponse)
 def conformity(request: requestForm = Depends()):
+    pipeline = keras_ocr.pipeline.Pipeline()
     uploaded_file = request.file
     filename = uploaded_file.filename
     if allowed_file(filename):
         with open(os.path.join(settings.UPLOAD_FOLDER, filename), "wb") as buffer:
             shutil.copyfileobj(uploaded_file.file, buffer)
-        conformity = Conformity(os.path.join(settings.UPLOAD_FOLDER, filename))
+        conformity = Conformity(
+            pipeline, os.path.join(settings.UPLOAD_FOLDER, filename)
+        )
         result = conformity.get_conformity()
         output_image_path = os.path.join(settings.OUTPUT_FOLDER, filename)
         if result["type"] == "valid":
