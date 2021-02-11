@@ -21,10 +21,12 @@ def rename_img(path, start=1, is_ok=True):
     path_list = sorted_alphanumeric(os.listdir(path))
     if is_ok:
         for index, img_path in enumerate(path_list):
-            os.rename(path+img_path, path+'EAF_OK'+str(index+int(start))+'.jpg')
+            if img_path.endswith('.jpg') or img_path.endswith('.png'):
+                os.rename(path+img_path, path+'EAF_OK'+str(index+int(start))+'.jpg')
     else:
         for index, img_path in enumerate(path_list):
-            os.rename(path+img_path, path+'EAF_KO'+str(index+int(start))+'.jpg')
+            if img_path.endswith('.jpg') or img_path.endswith('.png'):
+                os.rename(path+img_path, path+'EAF_KO'+str(index+int(start))+'.jpg')
 
 
 def add_text(path):

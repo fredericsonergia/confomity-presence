@@ -112,11 +112,11 @@ Pour plus d'informations sur les arguments des CLI, voir **CLI_data.py**
 Vous pouvez renommer les images KO ou OK (en EAF_OK_chiffre.jpg ou EAF_KO_chiffre.jpg) d'un dossier avec la CLI suivante:
 
 ```
-python CLI_data.py rename 
+python src/CLI_data.py rename 
 
 #exemple
 
-python CLI_data.py rename --path='path/du/dossier/images' start=0 is_ok=True
+python src/CLI_data.py rename --path='path/du/dossier/images' --start=0 --is_ok=True
 
 Après avoir renommer les images, il faut placer les images dans *VOC2021/JPEGImages*.
 ```
@@ -135,10 +135,10 @@ Ensuite il faut ajouter les noms (sans l'extension) aux fichiers Main/_.txt_ soi
 Pour plus d'informations sur les arguments des CLI, voir **CLI_detector.py**
 
 ```
-python CLI_detector.py train_from_pretrained
+python src/CLI_detector.py train_from_pretrained
 
 #exemple
-python CLI_detector.py train_from_pretrained --save_prefix='save_name_prefix' --data_path='../Data/EAF_real'  --batch_size=10 --epoch=15 --results_folder='results_ROC/' --log_foler='logs/'
+python src/CLI_detector.py train_from_pretrained --save_prefix='save_name_prefix' --data_path='Data/EAF_real' --batch_size=10 --epoch=15  --train_result_folder='results_train/' --log_foler='logs/' --model_folder='src/models/'
 
 ```
 
@@ -151,10 +151,10 @@ Pour plus d'informations sur les arguments des CLI, voir **CLI_detector.py**
 
 ```
 
-python CLI_detector.py train_from_finetuned 
+python src/CLI_detector.py train_from_finetuned 
 
 #exemple 
-python CLI_detector.py train_from_finetuned --save_prefix='save_name_prefix' --data_path='../Data/EAF_real' --model_path='models/model_name_best.params' --batch_size=10 --epoch=15  --results_folder='results_ROC/' --log_foler='logs/'
+python src/CLI_detector.py train_from_finetuned --save_prefix='save_name_prefix' --data_path='Data/EAF_real' --model_path='src/models/fake_best.params' --batch_size=10 --epoch=15  --train_result_folder='src/results_train/' --log_foler='src/logs/' --model_folder='src/models/'
 
 ```
 
@@ -164,12 +164,12 @@ Sauvegarde les courbes et les logs d'entraînement dans les dossiers indiqués e
 ## Comment évaluer un modèle ?
 
 ```
-python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux positif)
+python src/CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux positif)
 
 
 #exemple
 
-python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_path='models/path/to/model' --taux_fp=0.143 --results_folder='results_ROC/' --log_folder='logs/'
+python src/CLI_detector.py eval --data_path_test='Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_path='src/models/fake400_7style+real_best.params' --taux_fp=0.143 --results_folder='src/results_ROC/' --log_folder='src/logs/'
 ```
 
 En sortie:
@@ -178,15 +178,16 @@ Sauvegarde les logs (matrice de confusion) et résultat d'évaluation (ROC_curve
 
 
 ```
-python CLI_detector.py predict (faire une prédiction sur une image)
+python src/CLI_detector.py predict (faire une prédiction sur une image)
 
 #exemple
-python CLI_detector.py predict model_name='models/ssd_512_best.params' input_path='inputs/EAF3.jpg' output_folder='outputs/' thresh=0.3 data_path_test='../Data/EAF_real'
+python src/CLI_detector.py predict --model_name='src/models/fake400_7style+real_best.params' --input_path='inputs/EAF3.jpg' --output_folder='outputs/' --thresh=0.3
 
 ```
 
 En sortie:
 Sauvegarde l'image de la prédiction dans le dossier outpute renseigné en paramètre
+
 ```
 
 # La conformité
