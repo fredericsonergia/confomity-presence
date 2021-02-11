@@ -71,6 +71,10 @@ def distance_to_line(slope,ordinate,point) -> float:
   return distance
 
 def get_response_image(image_path):
+    """
+      @parameters: the path of an image uimage_path
+      @returns: image coded in bytes
+    """
     pil_img = Image.open(image_path, mode="r")  # reads the PIL image
     byte_arr = io.BytesIO()
     pil_img.save(byte_arr, format="PNG")  # convert the PIL image to byte array
