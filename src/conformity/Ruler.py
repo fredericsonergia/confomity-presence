@@ -1,13 +1,11 @@
 import numpy as np
 try:
     from src.conformity.Image import Image
-except:
-    from .Image import Image
-
-try:
     from src.conformity.helpers import slope_ordinate, extend_line, approximate_text_by_point, double_of_box_width, distance_to_line
 except:
+    from .Image import Image
     from .helpers import slope_ordinate, extend_line, approximate_text_by_point, double_of_box_width, distance_to_line
+
 
 class Ruler:
     """ class defining Ruler object on a photograph"""

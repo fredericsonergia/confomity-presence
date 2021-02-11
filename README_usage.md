@@ -48,6 +48,7 @@ pip install -r requirements.txt
 
 Pour ensuite lancer le server utilisez les commandes suivantes :
 A la racine du repository
+
 ```bash
 
 uvicorn src.app.app:app
