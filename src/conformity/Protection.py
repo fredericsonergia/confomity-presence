@@ -1,5 +1,13 @@
-from src.conformity.Image import Image
-from src.conformity.helpers import my_arg_max
+
+try:
+    from src.conformity.Image import Image
+except:
+    from .Image import Image
+
+try:
+    from src.conformity.helpers import my_arg_max
+except:
+    from .helpers import my_arg_max
 from scipy import ndimage
 import numpy as np
 #from typing import list

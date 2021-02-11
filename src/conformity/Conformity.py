@@ -1,13 +1,34 @@
-from src.conformity.Ruler import Ruler
-from src.conformity.Protection import Protection
-from src.conformity.Image import Image
-from src.conformity.helpers import (
-    slope_ordinate,
-    find_intersection,
-    approximate_text_by_point,
-    my_arg_max,
-    angle_betw_2_vects,
-)
+try:
+    from src.conformity.Ruler import Ruler
+except:
+    from .Ruler import Ruler
+
+try:
+    from src.conformity.Protection import Protection
+except:
+    from .Protection import Protection
+
+try:
+    from src.conformity.Image import Image
+except:
+    from .Image import Image
+
+try:
+    from src.conformity.helpers import (
+        slope_ordinate,
+        find_intersection,
+        approximate_text_by_point,
+        my_arg_max,
+        angle_betw_2_vects,
+    )
+except:
+    from .helpers import (
+        slope_ordinate,
+        find_intersection,
+        approximate_text_by_point,
+        my_arg_max,
+        angle_betw_2_vects,
+    )
 import math
 import cv2
 import os

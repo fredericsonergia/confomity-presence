@@ -1,7 +1,7 @@
 import argparse
 import keras_ocr
 import json
-from Conformity import Conformity
+from conformity.Conformity import Conformity
 pipeline = pipeline = keras_ocr.pipeline.Pipeline()
 
 my_parser = argparse.ArgumentParser(description="Json giving information about a conformity file.")
