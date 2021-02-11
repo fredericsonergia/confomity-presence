@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form, Depends
+from fastapi import FastAPI, UploadFile, Form, Depends
 from pydantic import BaseModel, BaseSettings
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
@@ -7,15 +7,15 @@ import shutil
 import io
 from base64 import encodebytes
 from PIL import Image
-import settings
+import src.app.settings as settings
 import os
 import matplotlib
 
 matplotlib.use("agg")
 import sys
 
-sys.path.append("../Detector")
-sys.path.append("../conformity")
+sys.path.append("src/Detector")
+sys.path.append("src/conformity")
 
 from Detector import ModelBasedDetector
 from Conformity import Conformity
@@ -120,7 +120,7 @@ ROUTES
 @app.post("/presence", response_model=presenceResponse)
 def presence(request: requestForm = Depends()):
     detector = ModelBasedDetector.from_finetuned(
-        "models/fake400_7style+real_best.params", thresh=0.32499
+        "./src/app/models/fake400_7style+real_best.params", thresh=0.32499
     )
     uploaded_file = request.file
     filename = uploaded_file.filename
@@ -130,7 +130,7 @@ def presence(request: requestForm = Depends()):
         score, prediction, box_coord = detector.predict(
             os.path.join(settings.UPLOAD_FOLDER, filename), settings.OUTPUT_FOLDER,
         )
-        output_image_path = os.path.join(settings.OUTPUT_FOLDER, filename)
+    output_image_path = os.path.join(settings.OUTPUT_FOLDER, filename)
     encoded_img = get_response_image(output_image_path)
     return {
         "score": score,

@@ -4,10 +4,18 @@ Plus de détail sont disponibles dans le README_dev ou dans la documentation tec
 
 # Installation
 
+Avant d'installer l'environnement virtuel, il faut que vous avez python 3.8.5 d'installé et que vous utilisiez cette version de python pour lancer les commandes.
+
+Vous pouvez vérifier la version de python avec :
+
+```bash
+python3 --version
+```
+
 Au début de l'installation vous pouvez créer un environnement virtuel avec la commande :
 
 ```bash
-python3 -m venv nom
+python3 -m venv .env
 ```
 
 ajouter le nom de l'environnemment dans le .gitignore
@@ -17,13 +25,13 @@ Puis l'activer avec
 windows:
 
 ```bash
-nom\Scripts\activate.bat
+.env\Scripts\activate.bat
 ```
 
 macOS :
 
 ```bash
-source nom/bin/activate
+source .env/bin/activate
 
 ```
 
@@ -32,7 +40,6 @@ Pour installer toutes les dependances nécéssaires à ce projet lancé la comma
 ```bash
 pip install -r requirements.txt
 ```
-
 
 Pour ensuite lancer le server utilisez les commandes suivantes :
 

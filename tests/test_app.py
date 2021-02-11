@@ -1,14 +1,26 @@
 import unittest
 from fastapi.testclient import TestClient
 
+from src.app import app
 
-class PredictRouteTestCase(unittest.TestCase):
-    def setup(self):
-        self.f = open("./test_images", "r")
+client = TestClient(app.app)
 
-    def test_read_main(self):
-        response = 200
-        self.assertEqual(response.status_code, 200)
 
-    def tearDown(self):
-        self.f.close()
+class PresenceRouteTestCase(unittest.TestCase):
+    def test_presence_main(self):
+        with open("tests/test_images/EAF_ko_16.jpg", "rb") as f:
+            response = client.post(
+                "/presence",
+                files={"file": ("EAF_ko_16.jpg", f, "multipart/form-data")},
+            )
+            self.assertEqual(response.status_code, 200)
+
+
+class ConformityRouteTestCase(unittest.TestCase):
+    def test_conformity_main(self):
+        with open("tests/test_images/EAF_ko_16.jpg", "rb") as f:
+            response = client.post(
+                "/conformity",
+                files={"file": ("EAF_ko_16.jpg", f, "multipart/form-data")},
+            )
+            self.assertEqual(response.status_code, 200)
