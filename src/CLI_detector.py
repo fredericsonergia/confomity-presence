@@ -48,7 +48,7 @@ class Predictor(object):
         start = time.time()
         detector = ModelBasedDetector.from_finetuned(model_name, data_path=data_path, save_prefix=save_prefix, batch_size=batch_size)
         epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list = detector.train(start_epoch, epochs, log_folder)
-        plot_train(epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list, save_prefix, train_results_folder, save_plot)
+        plot_train(epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list, save_prefix, train_result_folder, save_plot)
         end = time.time()
         print("the training took " + str(end - start) + " seconds")
 
