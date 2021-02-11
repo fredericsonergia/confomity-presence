@@ -9,7 +9,7 @@ from gluoncv import model_zoo
 class CliDetectorTestCase(unittest.TestCase):
     def setUp(self):
         Path("tests/test_data/detector_data").mkdir(parents=True, exist_ok=True)
-        Path("tests/test_data/detector_data/models").mkdir(parents=True, exist_ok=True)
+        Path("models").mkdir(parents=True, exist_ok=True)
         if os.path.exists("tests/test_data/detector_data/logs"):
             for f in os.listdir("tests/test_data/detector_data/logs"):
                 os.remove(os.path.join("tests/test_data/detector_data/logs", f))
@@ -24,10 +24,10 @@ class CliDetectorTestCase(unittest.TestCase):
             for f in os.listdir("tests/test_data/detector_data/results"):
                 os.remove(os.path.join("tests/test_data/detector_data/results", f))
             os.rmdir("tests/test_data/detector_data/results")
-        if os.path.exists("tests/test_data/detector_data/models"):
-            for f in os.listdir("tests/test_data/detector_data/models"):
+        if os.path.exists("models"):
+            for f in os.listdir("models"):
                 if f == "test_best.params":
-                    os.remove(os.path.join("tests/test_data/detector_data/models", f))
+                    os.remove(os.path.join("models", f))
         if os.path.exists("tests/test_data/detector_data/outputs"):
             for f in os.listdir("tests/test_data/detector_data/outputs"):
                 os.remove(os.path.join("tests/test_data/detector_data/outputs", f))
@@ -39,14 +39,14 @@ class CliDetectorTestCase(unittest.TestCase):
             base_model="ssd_512_mobilenet1.0_custom",
             save_prefix="test",
         )
-        name_model = os.listdir("tests/test_data/detector_data/models")
+        name_model = os.listdir("models")
         if not name_model:
             raise NameError(
                 "Veuillez déposer un modèle dans le dossier detector_data/models"
             )
         name = [n for n in name_model if n.endswith(".params")]
         self.detector2 = ModelBasedDetector.from_finetuned(
-            "tests/test_data/detector_data/models/" + name[0],
+            "models/" + name[0],
             data_path_test="tests/test_data/detector_data/for_test",
             save_prefix="test",
         )
@@ -63,7 +63,7 @@ class CliDetectorTestCase(unittest.TestCase):
             0,
             1,
             log_folder="tests/test_data/detector_data/logs/",
-            model_folder="tests/test_data/detector_data/models/",
+            model_folder="models/",
         )
         plot_train(
             epochs,
@@ -87,8 +87,10 @@ class CliDetectorTestCase(unittest.TestCase):
         self.assertEqual(name_train_result[0], "test_train_curves.png")
 
     def test_eval(self):
+        name_model = os.listdir("models/")
+        name = [n for n in name_model if n.endswith(".params")]
         detector2 = ModelBasedDetector.from_finetuned(
-            "tests/test_data/detector_data/models/ssd_512_test_best.params",
+            "models/" + name[0],
             data_path_test="tests/test_data/detector_data/for_test",
             save_prefix="test",
         )
