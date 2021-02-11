@@ -32,11 +32,11 @@ class CliDetectorTestCase(unittest.TestCase):
       os.rmdir('tests/test_data/detector_data/outputs')
     self.detector1 = ModelBasedDetector.from_pretrained(data_path_test='tests/test_data/detector_data/for_test', data_path='tests/test_data/detector_data/for_test',
                                                        batch_size=10, base_model='ssd_512_mobilenet1.0_custom', save_prefix='test')
-    name_model = os.listdir('tests/test_data/detector_data/models')
+    name_model = os.listdir('models/')
     if not name_model:
       raise NameError('Veuillez déposer un modèle dans le dossier detector_data/models')
     name = [n for n in name_model if n.endswith(".params")]
-    self.detector2 = ModelBasedDetector.from_finetuned('tests/test_data/detector_data/models/' + name[0], data_path_test='tests/test_data/detector_data/for_test', save_prefix='test')
+    self.detector2 = ModelBasedDetector.from_finetuned('models/' + name[0], data_path_test='tests/test_data/detector_data/for_test', save_prefix='test')
 
   def test_train_from_pretrained(self):
     epochs, ce_loss_list, ce_loss_val, smooth_loss_list, smooth_loss_val, map_list = self.detector1.train(0,1, log_folder='tests/test_data/detector_data/logs/',
@@ -54,7 +54,9 @@ class CliDetectorTestCase(unittest.TestCase):
     self.assertEqual(name_train_result[0],'test_train_curves.png')
 
   def test_eval(self):
-    detector2 = ModelBasedDetector.from_finetuned('tests/test_data/detector_data/models/ssd_512_test_best.params',data_path_test='tests/test_data/detector_data/for_test', save_prefix='test')
+    name_model = os.listdir('models/')
+    name = [n for n in name_model if n.endswith(".params")]
+    detector2 = ModelBasedDetector.from_finetuned('models/' + name[0],data_path_test='tests/test_data/detector_data/for_test', save_prefix='test')
     self.detector2._set_tests()
     self.detector2._set_labels_and_scores('tests/test_data/detector_data/logs/')
     self.detector2.eval(0.5, True, 'tests/test_data/detector_data/results/', 'tests/test_data/detector_data/logs/')
