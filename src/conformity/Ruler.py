@@ -3,7 +3,6 @@ try:
     from src.conformity.Image import Image
 except:
     from .Image import Image
-import keras_ocr
 
 try:
     from src.conformity.helpers import slope_ordinate, extend_line, approximate_text_by_point, double_of_box_width, distance_to_line
@@ -28,7 +27,6 @@ class Ruler:
         """
         if self.digits == None:
             images = [self.image.get_resized()]
-            #pipeline = pipeline = keras_ocr.pipeline.Pipeline()
             prediction_groups = self.__model_pipeline.recognize(images)
             to_return =[]
             #print('digits_brut', prediction_groups)
