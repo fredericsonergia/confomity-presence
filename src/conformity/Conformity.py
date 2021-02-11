@@ -1,19 +1,7 @@
 try:
     from src.conformity.Ruler import Ruler
-except:
-    from .Ruler import Ruler
-
-try:
     from src.conformity.Protection import Protection
-except:
-    from .Protection import Protection
-
-try:
     from src.conformity.Image import Image
-except:
-    from .Image import Image
-
-try:
     from src.conformity.helpers import (
         slope_ordinate,
         find_intersection,
@@ -21,7 +9,11 @@ try:
         my_arg_max,
         angle_betw_2_vects,
     )
+
 except:
+    from .Ruler import Ruler
+    from .Protection import Protection
+    from .Image import Image
     from .helpers import (
         slope_ordinate,
         find_intersection,
@@ -29,9 +21,10 @@ except:
         my_arg_max,
         angle_betw_2_vects,
     )
+
+
 import math
 import cv2
-import os
 
 
 class Conformity:
@@ -59,7 +52,7 @@ class Conformity:
             @parameters: object itself
             @returns: point representing the intersection of ruler and protection of the object
         """
-        if self.__intersection == None:
+        if self.__intersection is None:
             ruler_start_point, ruler_end_point = self.__ruler.get_axis()
             # print("the axis is: ", self.__ruler.get_axis())
             # print("ruler point coordinates ", ruler_start_point, ruler_end_point)
@@ -118,7 +111,7 @@ class Conformity:
             @parameters: object itself
             @returns: the maximum of the digits on the ruler under the protection axis. Alongside with its ordinate.
         """
-        if self.__max_digit_read == None:
+        if self.__max_digit_read is None:
             ruler_digits = self.__ruler.get_digits()
             ruler_digits = [
                 (element[0], approximate_text_by_point(element)[1])
@@ -140,7 +133,7 @@ class Conformity:
             @parameters: object itself
             @returns: the distance between the protection and the chimney
         """
-        if self.__distance == None:
+        if self.__distance is None:
             pixel_cm_scale = self.__ruler.get_pixel_centimeter_scale()
             intersection = self.get_intersection()
             max_digit_read = self.get_max_digit_read()
@@ -158,7 +151,7 @@ class Conformity:
             @parameters: object itself
             @returns: dict with type : error | valid, with either message or distance
         """
-        if self.__conformity == None:
+        if self.__conformity is None:
             if not self.__protection.check_protection():
                 self.__conformity = {
                     "type": "error",
@@ -180,7 +173,13 @@ class Conformity:
                     "message": "Votre réglette n'est pas assez perpendiculaire avec la protection.",
                 }
             else:
-                self.__conformity = {"type": "valid", "distance": self.get_distance(), "intersection":self.get_intersection(), "ruleur_axis":self.__ruler.get_axis(), "protection_axis":self.__protection.get_axis_from_edges()}
+                self.__conformity = {
+                    "type": "valid",
+                    "distance": self.get_distance(),
+                    "intersection": self.get_intersection(),
+                    "ruleur_axis": self.__ruler.get_axis(),
+                    "protection_axis": self.__protection.get_axis_from_edges(),
+                }
         return self.__conformity
 
     def get_conformity_distance(self) -> float:
