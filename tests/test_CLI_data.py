@@ -7,7 +7,7 @@ class CliDataTestCase(unittest.TestCase):
     def setUp(self):
         try:
             os.rename("EAF_OK1.jpg", "a.jpg")
-            os.rename("EAF_OK2.jpg", "a.jpg")
+            os.rename("EAF_OK2.jpg", "b.jpg")
         except:
             print("rename fail")
 

@@ -82,7 +82,6 @@ class CliDetectorTestCase(unittest.TestCase):
         self.assertNotEqual(map_list, [])
         name_train_result = os.listdir("tests/test_data/detector_data/results_train/")
         name_log = os.listdir("tests/test_data/detector_data/logs/")
-        self.assertIn("test_best_map.log", name_log)
         self.assertIn("test_train.log", name_log)
         self.assertEqual(name_train_result[0], "test_train_curves.png")
 
