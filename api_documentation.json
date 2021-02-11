@@ -122,13 +122,27 @@
           "type": { "title": "Type", "type": "string" },
           "image": { "title": "Image", "type": "string" },
           "distance": { "title": "Distance", "type": "number" },
-          "message": { "title": "Message", "type": "string" }
+          "message": { "title": "Message", "type": "string" },
+          "intersection": {
+            "title": "Intersection",
+            "type": "array",
+            "items": {}
+          },
+          "ruler_axis": { "title": "Ruler Axis", "type": "array", "items": {} },
+          "protection_axis": {
+            "title": "Protection Axis",
+            "type": "array",
+            "items": {}
+          }
         },
         "example": {
           "type": "error si le model n'arrive pas à traiter l'image, valid sinon",
           "image": "image encodé en bytes",
           "distance": "si type est valid : distance mesurée en cm, None sinon",
-          "message": "si type est error : message à renvoyer à l'utilisateur pour expliquer l'erreur"
+          "message": "si type est error : message à renvoyer à l'utilisateur pour expliquer l'erreur",
+          "intersection": "si type est valid, tuple des coordonées de l'intersection",
+          "ruler_axis": "Deux points qui définissent l'axe de la règle",
+          "protection_axis": "Deux points qui définissent l'axe de la protection"
         }
       },
       "presenceResponse": {
@@ -144,7 +158,7 @@
         "example": {
           "score": "score de confiance entre 0 et 1",
           "image": "image encodé en bytes",
-          "box": "list qui définisse le rectangle de justification [xmin,ymin,xmax,ymax]",
+          "box": "list qui définit le rectangle de justification [xmin,ymin,xmax,ymax]",
           "prediction": "True si presence de protection, False sinon"
         }
       }

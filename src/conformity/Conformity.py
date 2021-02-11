@@ -177,7 +177,7 @@ class Conformity:
                     "type": "valid",
                     "distance": self.get_distance(),
                     "intersection": self.get_intersection(),
-                    "ruleur_axis": self.__ruler.get_axis(),
+                    "ruler_axis": self.__ruler.get_axis(),
                     "protection_axis": self.__protection.get_axis_from_edges(),
                 }
         return self.__conformity

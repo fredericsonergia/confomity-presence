@@ -4,7 +4,6 @@ Plus de détail sont disponibles dans le README_dev ou dans la documentation tec
 
 # Installation
 
-<<<<<<< HEAD
 Avant d'installer l'environnement virtuel, il faut que vous avez python 3.8.5 d'installé et que vous utilisiez cette version de python pour lancer les commandes.
 
 Vous pouvez vérifier la version de python avec :
@@ -14,10 +13,6 @@ python3 --version
 ```
 
 Au début de l'installation vous pouvez créer un environnement virtuel avec la commande :
-=======
-Au début de l'installation vous pouvez créer un environnement virtuel avec la commande avec Python 3.8.5:
-
->>>>>>> master
 
 ```bash
 python3 -m venv .env
