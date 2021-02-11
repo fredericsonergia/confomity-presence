@@ -59,6 +59,9 @@ def new_trainloader_call(self, src, label):
 def ssd_train_dataloader(
     net, train_dataset, data_shape=512, batch_size=10, num_workers=0
 ):
+    '''
+    returns the train loader from gluoncv
+    '''
     from gluoncv.data.batchify import Tuple, Stack, Pad
     from gluoncv.data.transforms.presets.ssd import SSDDefaultTrainTransform
 
@@ -83,6 +86,9 @@ def ssd_train_dataloader(
 
 
 def ssd_val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0):
+    '''
+    returns the validation loader from gluoncv
+    '''
     from gluoncv.data.batchify import Tuple, Stack, Pad
     from gluoncv.data.transforms.presets.ssd import SSDDefaultValTransform
 
@@ -103,10 +109,7 @@ def ssd_val_dataloader(val_dataset, data_shape=512, batch_size=10, num_workers=0
 
 def validate(net, val_data, ctx, eval_metric, flip_test=False):
     """
-    
-    validation on MAP
-    Args:
-    -
+    validation on MAP (mean average precision)
     """
     eval_metric.reset()
     net.flip_test = flip_test
@@ -146,7 +149,7 @@ def validate(net, val_data, ctx, eval_metric, flip_test=False):
     return eval_metric.get()
 
 
-def save_params(net, best_map, current_map, epoch, prefix="ssd_512"):
+def save_params(net, best_map, current_map, epoch, log_folder, prefix="ssd_512", model_folder='models/'):
     """
     save parameters of the networks
     Args:
@@ -157,8 +160,9 @@ def save_params(net, best_map, current_map, epoch, prefix="ssd_512"):
     current_map = float(current_map)
     if current_map > best_map[0]:
         best_map[0] = current_map
-        net.save_parameters("models/{:s}_best.params".format(prefix))
-        with open("logs/" + prefix + "_best_map.log", "a") as f:
+        net.save_parameters(model_folder + "{:s}_best.params".format(prefix))
+        print('model saved')
+        with open(log_folder + prefix + "_best_map.log", "a") as f:
             f.write("{:04d}:\t{:.4f}\n".format(epoch, current_map))
 
 

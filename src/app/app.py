@@ -7,7 +7,7 @@ import shutil
 import io
 from base64 import encodebytes
 from PIL import Image
-import settings
+from src.app import settings
 import os
 import matplotlib
 
@@ -17,8 +17,8 @@ import sys
 sys.path.append("../Detector")
 sys.path.append("../conformity")
 
-from Detector import ModelBasedDetector
-from Conformity import Conformity
+from src.Detector.Detector import ModelBasedDetector
+from src.conformity.Conformity import Conformity
 
 sys.path.append("/utils")
 
@@ -89,7 +89,7 @@ class presenceResponse(BaseModel):
             "example": {
                 "score": "score de confiance entre 0 et 1",
                 "image": "image encodé en bytes",
-                "box": "list qui définisse le rectangle de justification [xmin,ymin,xmax,ymax]",
+                "box": "list qui définit le rectangle de justification [xmin,ymin,xmax,ymax]",
                 "prediction": "True si presence de protection, False sinon",
             }
         }
