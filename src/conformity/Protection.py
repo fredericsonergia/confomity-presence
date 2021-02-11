@@ -2,6 +2,7 @@ from Image import Image
 from helpers import my_arg_max
 from scipy import ndimage
 import numpy as np
+#from typing import list
 
 class Protection:
     """ class defining the protection object on a photograph"""
@@ -12,7 +13,11 @@ class Protection:
         self.__axis_from_edges = None
         self.__right_direction = None
 
-    def get_right_direction(self):
+    def get_right_direction(self)->dict:
+        """
+        @parameters: object itself
+        @returns: an object indicating information on the protection axis approximation 
+        """
         if self.__right_direction == None:
             angle = None
             counts = 0
@@ -58,6 +63,10 @@ class Protection:
 
 
     def check_protection(self)-> bool:
+        """
+        @parameters: object itself
+        @return: True if protection is supposed detected. False otherwise
+        """
         right_dir = self.get_right_direction()
         min_of_255_on_a_line = int(self.__image.resolution[1]/5)
         #print("the min",min_of_255_on_a_line)

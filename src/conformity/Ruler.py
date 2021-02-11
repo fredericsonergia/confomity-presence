@@ -1,17 +1,17 @@
 import numpy as np
 from Image import Image
-import keras_ocr
 from helpers import slope_ordinate, extend_line, approximate_text_by_point, double_of_box_width, distance_to_line
 
 class Ruler:
     """ class defining Ruler object on a photograph"""
 
-    def __init__(self,imagePath:str)->None:
+    def __init__(self, model_pipeline, imagePath:str)->None:
         """constructor of class Ruler"""
         self.image = Image(imagePath)
         self.digits = None
         self.__axis = None
         self.__pixel_centimeter_scale = None
+        self.__model_pipeline = model_pipeline
 
     def get_digits(self)->list:
         """
@@ -20,8 +20,8 @@ class Ruler:
         """
         if self.digits == None:
             images = [self.image.get_resized()]
-            pipeline = pipeline = keras_ocr.pipeline.Pipeline()
-            prediction_groups = pipeline.recognize(images)
+            #pipeline = pipeline = keras_ocr.pipeline.Pipeline()
+            prediction_groups = self.__model_pipeline.recognize(images)
             to_return =[]
             #print('digits_brut', prediction_groups)
             if len(prediction_groups[0]) >0:
@@ -114,6 +114,10 @@ class Ruler:
         return self.__pixel_centimeter_scale
 
     def check_inclinaison_conformity(self, tolerance) ->bool:
+        """
+        @parameters: the object itself and a tolorance value on distance change
+        @returns: True if inclinaison with respect to horizontal plane. False otherwise
+        """
         digits = self.get_digits()
         digits = [(int(element[0]),approximate_text_by_point(element)[1]) for element in digits]
         differences = []
@@ -133,6 +137,10 @@ class Ruler:
         return all(check_bools)
 
     def check_digits_readability(self) -> bool:
+        """
+        @parameters: the object itself
+        @returns: True if it is considered that digits are well read. False otherwise
+        """
         digits = self.get_digits()
         return len (digits) >= 3
 
