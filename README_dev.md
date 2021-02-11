@@ -79,6 +79,8 @@ Les arguments sont les suivants :
 
 # Entrainement
 
+Le site de gluoncv peut être utile si il y a besoin d'approfondir le code (https://cv.gluon.ai/contents.html)
+
 ## Avant l'entraînement
 
 ### Format des données
