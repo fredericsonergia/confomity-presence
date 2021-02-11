@@ -1,5 +1,10 @@
 Voici le repository pour le server du projet DTY du Paris Digital Lab pour Sonergia contenant le cas d'usage de détection de l'écart au feu et de sa conformité.
 
+# Installation
+
+Pour installer l'environnement veuillez regarder le README_usage.mdr
+
+
 # Test
 
 Avant d'effectuer le test :
@@ -11,6 +16,8 @@ python -m unittest discover -s tests
 ```
 
 # Entrainement
+
+Le site de gluoncv peut être utile si il y a besoin d'approfondir le code (https://cv.gluon.ai/contents.html)
 
 ## Avant l'entraînement
 
@@ -100,7 +107,7 @@ python CLI_detector.py eval (évaluation d'un modèle en fixant un taux de faux 
 
 #exemple
 
-python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_name='models/path/to/model' --taux_fp=0.143
+python CLI_detector.py eval --data_path_test='../Data/EAF_real' --save_prefix='fake400_19style+real_on_real' --model_path='models/path/to/model' --taux_fp=0.143 --results_folder='results_ROC/' --log_folder='logs/'
 ```
 
 En sortie:

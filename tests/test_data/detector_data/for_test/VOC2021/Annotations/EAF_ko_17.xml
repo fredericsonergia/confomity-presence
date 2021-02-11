@@ -1,0 +1,26 @@
+<annotation>
+	<folder>JPEGImages</folder>
+	<filename>EAF_ko_17.jpg</filename>
+	<path>EAF_test/VOC2021/JPEGImages//EAF_ko_17.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>480</width>
+		<height>270</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>cheminee</name>
+		<pose>Unspecified</pose>
+		<truncated>1</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>168</xmin>
+			<ymin>1</ymin>
+			<xmax>322</xmax>
+			<ymax>179</ymax>
+		</bndbox>
+	</object>
+</annotation>

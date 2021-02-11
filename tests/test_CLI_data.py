@@ -8,8 +8,6 @@ class CliDataTestCase(unittest.TestCase):
         try:
             os.rename("EAF_OK1.jpg", "a.jpg")
             os.rename("EAF_OK2.jpg", "a.jpg")
-        except:
-            pass
 
     def test_rename(self):
         name = ["EAF_OK1.jpg", "EAF_OK2.jpg"]

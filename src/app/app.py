@@ -7,18 +7,19 @@ import shutil
 import io
 from base64 import encodebytes
 from PIL import Image
-import src.app.settings as settings
 import os
 import matplotlib
 
 matplotlib.use("agg")
 import sys
 
+from src.app import settings
+
 sys.path.append("src/Detector")
 sys.path.append("src/conformity")
 
-from Detector import ModelBasedDetector
-from Conformity import Conformity
+from src.Detector.Detector import ModelBasedDetector
+from src.conformity.Conformity import Conformity
 
 sys.path.append("/utils")
 
@@ -89,7 +90,7 @@ class presenceResponse(BaseModel):
             "example": {
                 "score": "score de confiance entre 0 et 1",
                 "image": "image encodé en bytes",
-                "box": "list qui définisse le rectangle de justification [xmin,ymin,xmax,ymax]",
+                "box": "list qui définit le rectangle de justification [xmin,ymin,xmax,ymax]",
                 "prediction": "True si presence de protection, False sinon",
             }
         }
@@ -120,7 +121,7 @@ ROUTES
 @app.post("/presence", response_model=presenceResponse)
 def presence(request: requestForm = Depends()):
     detector = ModelBasedDetector.from_finetuned(
-        "./src/app/models/fake400_7style+real_best.params", thresh=0.32499
+        "/models/fake400_7style+real_best.params", thresh=0.32499
     )
     uploaded_file = request.file
     filename = uploaded_file.filename
