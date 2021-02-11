@@ -40,12 +40,16 @@ Pour installer toutes les dependances nécéssaires à ce projet lancé la comma
 ```bash
 pip install -r requirements.txt
 ```
+
+Installation du modèle:
+
+- créer le dossier models à la racine.
+- mettre le modèle dedans
+
+
 Pour ensuite lancer le server utilisez les commandes suivantes :
 A la racine du repository
 
-```
-Créer un dossier models à la racine 
-```
 
 ```bash
 uvicorn src.app.app:app
