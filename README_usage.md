@@ -4,24 +4,39 @@ Plus de détail sont disponibles dans le README_dev ou dans la documentation tec
 
 # Installation
 
-Au début de l'installation vous pouvez créer un environnement virtuel avec la commande :
+<<<<<<< HEAD
+Avant d'installer l'environnement virtuel, il faut que vous avez python 3.8.5 d'installé et que vous utilisiez cette version de python pour lancer les commandes.
+
+Vous pouvez vérifier la version de python avec :
 
 ```bash
-python3 -m venv nom
+python3 --version
 ```
+
+Au début de l'installation vous pouvez créer un environnement virtuel avec la commande :
+=======
+Au début de l'installation vous pouvez créer un environnement virtuel avec la commande avec Python 3.8.5:
+
+>>>>>>> master
+
+```bash
+python3 -m venv .env
+```
+
+ajouter le nom de l'environnemment dans le .gitignore
 
 Puis l'activer avec
 
 windows:
 
 ```bash
-nom\Scripts\activate.bat
+.env\Scripts\activate.bat
 ```
 
 macOS :
 
 ```bash
-source nom/bin/activate
+source .env/bin/activate
 
 ```
 
@@ -32,11 +47,10 @@ pip install -r requirements.txt
 ```
 
 Pour ensuite lancer le server utilisez les commandes suivantes :
-
+A la racine du repository
 ```bash
-cd src/app
 
-uvicorn app:app
+uvicorn src.app.app:app
 ```
 
 # Documentation des differentes routes de l'api

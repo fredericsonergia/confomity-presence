@@ -1,25 +1,39 @@
-from Ruler import Ruler
-from Protection import Protection
-from Image import Image
-from helpers import (
-    slope_ordinate,
-    find_intersection,
-    approximate_text_by_point,
-    my_arg_max,
-    angle_betw_2_vects,
-)
+try:
+    from src.conformity.Ruler import Ruler
+    from src.conformity.Protection import Protection
+    from src.conformity.Image import Image
+    from src.conformity.helpers import (
+        slope_ordinate,
+        find_intersection,
+        approximate_text_by_point,
+        my_arg_max,
+        angle_betw_2_vects,
+    )
+
+except:
+    from .Ruler import Ruler
+    from .Protection import Protection
+    from .Image import Image
+    from .helpers import (
+        slope_ordinate,
+        find_intersection,
+        approximate_text_by_point,
+        my_arg_max,
+        angle_betw_2_vects,
+    )
+
+
 import math
 import cv2
-import os
 
 
 class Conformity:
     "Class representing the conformity of a construction site"
 
-    def __init__(self, imagePath: str, tolerance=2 / 100) -> None:
+    def __init__(self, model_pipeline, imagePath: str, tolerance=2 / 100) -> None:
         """Constructor of class Conformity """
         self.__image = Image(imagePath)
-        self.__ruler = Ruler(imagePath)
+        self.__ruler = Ruler(model_pipeline, imagePath)
         self.__protection = Protection(imagePath)
         self.__intersection = None
         self.__distance = None
@@ -38,7 +52,7 @@ class Conformity:
             @parameters: object itself
             @returns: point representing the intersection of ruler and protection of the object
         """
-        if self.__intersection == None:
+        if self.__intersection is None:
             ruler_start_point, ruler_end_point = self.__ruler.get_axis()
             # print("the axis is: ", self.__ruler.get_axis())
             # print("ruler point coordinates ", ruler_start_point, ruler_end_point)
@@ -64,7 +78,11 @@ class Conformity:
             )
         return self.__intersection
 
-    def check_orthogonality(self) -> dict:
+    def check_orthogonality(self) -> bool:
+        """
+        @parameters: object itself
+        @returns: True if orthogonality checked between the ruler and the protection. False otherwise
+        """
         ruler_start_point, ruler_end_point = self.__ruler.get_axis()
         (
             protection_start_point,
@@ -86,14 +104,14 @@ class Conformity:
         absolute_error_on_angle = math.atan(math.sqrt(2 * self.__tolerance))
         value1 = math.pi / 2 - absolute_error_on_angle <= intersection_angle
         value2 = intersection_angle <= math.pi / 2 + absolute_error_on_angle
-        return value1 and value2, intersection_angle, absolute_error_on_angle
+        return value1 and value2
 
     def get_max_digit_read(self) -> (float, float):
         """
             @parameters: object itself
             @returns: the maximum of the digits on the ruler under the protection axis. Alongside with its ordinate.
         """
-        if self.__max_digit_read == None:
+        if self.__max_digit_read is None:
             ruler_digits = self.__ruler.get_digits()
             ruler_digits = [
                 (element[0], approximate_text_by_point(element)[1])
@@ -115,7 +133,7 @@ class Conformity:
             @parameters: object itself
             @returns: the distance between the protection and the chimney
         """
-        if self.__distance == None:
+        if self.__distance is None:
             pixel_cm_scale = self.__ruler.get_pixel_centimeter_scale()
             intersection = self.get_intersection()
             max_digit_read = self.get_max_digit_read()
@@ -133,21 +151,21 @@ class Conformity:
             @parameters: object itself
             @returns: dict with type : error | valid, with either message or distance
         """
-        if self.__conformity == None:
+        if self.__conformity is None:
             if not self.__protection.check_protection():
                 self.__conformity = {
                     "type": "error",
-                    "message": "Nous n'arrivons pas à bien détecter la protection présente sur l'image.",
+                    "message": "Svp, reprenez une photo. Nous n'arrivons pas à bien détecter la protection présente sur l'image.",
                 }
             elif not self.__ruler.check_digits_readability():
                 self.__conformity = {
                     "type": "error",
-                    "message": "Nous n'arrivons pas à détecter de réglette ou lire les chiffres sur la réglette.",
+                    "message": "Svp, reprenez une photo. Nous n'arrivons pas à détecter de réglette ou lire les chiffres sur la réglette.",
                 }
             elif not self.__ruler.check_inclinaison_conformity(15 / 100):
                 self.__conformity = {
                     "type": "error",
-                    "message": "Votre réglettre ne semble pas parallèle au sol ou à l'appareil photo.",
+                    "message": "Svp, reprenez une photo. Votre réglettre ne semble pas parallèle au sol ou à l'appareil photo.",
                 }
             elif not self.check_orthogonality():
                 self.__conformity = {
@@ -155,7 +173,13 @@ class Conformity:
                     "message": "Votre réglette n'est pas assez perpendiculaire avec la protection.",
                 }
             else:
-                self.__conformity = {"type": "valid", "distance": self.get_distance()}
+                self.__conformity = {
+                    "type": "valid",
+                    "distance": self.get_distance(),
+                    "intersection": self.get_intersection(),
+                    "ruleur_axis": self.__ruler.get_axis(),
+                    "protection_axis": self.__protection.get_axis_from_edges(),
+                }
         return self.__conformity
 
     def get_conformity_distance(self) -> float:
@@ -194,6 +218,10 @@ class Conformity:
         return self.__image_path
 
     def get_illustration(self, output_image_path):
+        """
+        @parameters: object itself, the output path output_image_path
+        @returns: Nothing. An image in bytes is created and then saved at given location
+        """
         ruler_axis = self.__ruler.get_axis()
         protection_axis = self.__protection.get_axis_from_edges()
         ruler_start_point, ruler_end_point = ruler_axis
