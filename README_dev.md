@@ -133,6 +133,6 @@ Des exemples de commandes sont:
 #visulaiser les résulats d'évaluation de conformité pour l'image située à image_path
 python CLI_conformity.py image_path
 
-#suavegarder l'image dans un fichier json
+#sauvegarder le résultat de l'évaluation dans un .json
 python CLI_conformity.py --save image_path
 ```
