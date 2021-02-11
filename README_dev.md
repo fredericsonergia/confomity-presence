@@ -130,7 +130,7 @@ Sauvegarde l'image de la prédiction dans le dossier outpute renseigné en param
 Mise à disposition d'une CLI qui permet d'afficher les résultats au sujet de l'évaluation de la conformité pour une photographie de chantier donnée.
 Des exemples de commandes sont:
 ```
-#visulaiser les résulats d'évaluation de conformité pour l'image située à image_path
+#visualiser les résulats d'évaluation de conformité pour l'image située à image_path
 python CLI_conformity.py image_path
 
 #sauvegarder le résultat de l'évaluation dans un .json

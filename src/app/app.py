@@ -10,7 +10,7 @@ from PIL import Image
 import os
 import matplotlib
 import keras_ocr
-
+from pathlib import Path
 matplotlib.use("agg")
 import sys
 
@@ -28,6 +28,8 @@ MODEL_FOLDER = os.path.dirname(os.path.abspath(__file__)) + "/models/"
 UPLOAD_FOLDER = os.path.dirname(os.path.abspath(__file__)) + "/uploads/"
 OUTPUT_FOLDER = os.path.dirname(os.path.abspath(__file__)) + "/outputs/"
 
+Path(UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
+Path(OUTPUT_FOLDER).mkdir(parents=True, exist_ok=True)
 
 class Settings(BaseSettings):
     MODEL_FOLDER: str = MODEL_FOLDER

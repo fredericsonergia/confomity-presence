@@ -169,7 +169,6 @@ class ModelBasedDetector(BaseDetector):
                 y_true[i] = 1
             y_scores[i] = n_scores.asnumpy()[0][0][0]
         mean_iou = np.mean(iou_list[iou_list > 0])
-        print(y_true, y_scores)
         Path(log_folder).mkdir(parents=True, exist_ok=True)
         with open(log_folder + 'eval.log', "a") as f:
             f.write(f"L'intersection over union moyen est : {mean_iou:.3f}\n")
